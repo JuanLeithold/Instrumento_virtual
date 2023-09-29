@@ -1,0 +1,4 @@
+../Core/Src/rs485.c:17:6:RS485_Send_Buffer	16	static
+../Core/Src/rs485.c:22:6:RS485_Flush_Buffer	16	static
+../Core/Src/rs485.c:30:9:RS485_Read_Buffer	16	static
+../Core/Src/rs485.c:66:9:RS485_Read_Address	16	static
