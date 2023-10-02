@@ -92,9 +92,11 @@ int main(void)
   MX_USART1_UART_Init();
 
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13, GPIO_PIN_SET);
    HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
    extern char rs_buftx[BUFFER_TX];
+   char name[4];
+   int i=0;
 
   /* USER CODE END 2 */
 
@@ -104,12 +106,28 @@ int main(void)
   {
 
 
-	  char state[]="juan";
 
-	  	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+	 		HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
 
-	  	  HAL_UART_Transmit(&huart1, &state, strlen(state), TIME_OUT);
-	  	  HAL_Delay(1000);
+	 	  if (HAL_UART_Receive(&huart1, &rs_buftx, 1, TIME_OUT)==HAL_OK)
+	 	  	  	  {
+	 		  	  	  	  name[i]=rs_buftx[0];
+	 	  	  	  	  	  i++;
+	 	  				  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+	 	  				  if (i==4)
+	 	  				  {
+	 	  					  i=0;
+	 	  					  HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
+	 	  					  HAL_UART_Transmit(&huart1, &name, strlen(name), TIME_OUT);
+	 	  				  }
+	 	  				  HAL_Delay(200);
+	 	  				  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+	 	  	 	  }
+
+	  	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+
+	  	  //HAL_UART_Transmit(&huart1, &state, strlen(state), TIME_OUT);
+	  	  //HAL_Delay(1000);
 
 	  	 /*if (HAL_UART_Receive(&huart1, rs_buftx, 1, TIME_OUT)==HAL_OK)
 	  	  {
