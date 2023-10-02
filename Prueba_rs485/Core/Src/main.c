@@ -23,7 +23,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "rs485.h"
 
+#include <stdlib.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -87,7 +90,11 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
+
   /* USER CODE BEGIN 2 */
+  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13, GPIO_PIN_RESET);
+   HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
+   extern char rs_buftx[BUFFER_TX];
 
   /* USER CODE END 2 */
 
@@ -95,6 +102,24 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
+
+	  char state[]="juan";
+
+	  	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+
+	  	  HAL_UART_Transmit(&huart1, &state, strlen(state), TIME_OUT);
+	  	  HAL_Delay(1000);
+
+	  	 /*if (HAL_UART_Receive(&huart1, rs_buftx, 1, TIME_OUT)==HAL_OK)
+	  	  {
+				  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+				  HAL_Delay(1000);
+				  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+				  HAL_Delay(1000);
+	 	  }*/
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
