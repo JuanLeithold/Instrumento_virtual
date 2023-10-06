@@ -1,7 +1,7 @@
 #ifndef INC_RS485_H_
 #define INC_RS485_H_
 
-#define BUFFER_TX 64
+#define BUFFER_TX 5
 #define TIME_OUT 100
 
 #define LEN_BUF 4
