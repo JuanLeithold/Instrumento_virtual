@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := Prueba_rs485
+BUILD_ARTIFACT_NAME := Instrumento Virtual
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-Prueba_rs485.elf \
+Instrumento\ Virtual.elf \
 
 MAP_FILES += \
-Prueba_rs485.map \
+Instrumento\ Virtual.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-Prueba_rs485.list \
+Instrumento\ Virtual.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: Prueba_rs485.elf secondary-outputs
+main-build: Instrumento\ Virtual.elf secondary-outputs
 
 # Tool invocations
-Prueba_rs485.elf Prueba_rs485.map: $(OBJS) $(USER_OBJS) C:\Users\Juan\ Leithold\Instrumento_virtual\Prueba_rs485\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Prueba_rs485.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Juan Leithold\Instrumento_virtual\Prueba_rs485\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Prueba_rs485.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Instrumento\ Virtual.elf Instrumento\ Virtual.map: $(OBJS) $(USER_OBJS) C:\Users\Juan\ Leithold\Instrumento_virtual\BluePill\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Instrumento Virtual.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Juan Leithold\Instrumento_virtual\BluePill\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Instrumento Virtual.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Prueba_rs485.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Prueba_rs485.list"
+Instrumento\ Virtual.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Instrumento Virtual.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) Prueba_rs485.elf Prueba_rs485.list Prueba_rs485.map default.size.stdout
+	-$(RM) Instrumento\ Virtual.elf Instrumento\ Virtual.list Instrumento\ Virtual.map Instrumento\\ Virtual.elf default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)

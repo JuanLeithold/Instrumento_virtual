@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -58,7 +59,12 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+union union_var{
 
+	int x;
+	char arreglo[4];
+
+};
 /* USER CODE END 0 */
 
 /**
@@ -68,6 +74,11 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	union union_var aux;
+	uint8_t rs_buftx[4];
+	int32_t c1=0;
+	int32_t c2=0;
+	char cadena;
 
   /* USER CODE END 1 */
 
@@ -75,7 +86,7 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
+  MX_TIM3_Init();
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -84,18 +95,16 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
-
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13, GPIO_PIN_SET);
-   HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
-   uint8_t rs_buftx[4];
 
+/*Delaracion de variables*/
 
   /* USER CODE END 2 */
 
@@ -103,41 +112,22 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-
-
 	 	 HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);// Para rx
 
 	 	  if (HAL_UART_Receive(&huart1, &rs_buftx, 4, TIME_OUT)==HAL_OK)
 	 	  	  	  {
-	 		  	  	  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-	 		  	  	  	 //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-	 		  	  	  	  //name[0]=&rs_buftx;
-	 	  	  	  	  	  //i++;
-	 	  				  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-	 	  				  //if (i==0)
-	 	  				  //{
-	 	  					 // i=0;
-	 	  					  HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
-
-	 	  					  HAL_UART_Transmit(&huart1, &rs_buftx, 4, TIME_OUT);
-	 	  				  //}
-	 	  				  //HAL_Delay(200);
-	 	  				  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+	 		  	  	 HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	 		  	  	 for (int i=0; i<4;i++)
+	 		  	  	 {
+	 		  	  		 aux.arreglo[i]=rs_buftx[i];
+	 		  	  	 }
+	 		  	  	 c1 = aux.x;
+	 		  	  	 HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
+	 		  	  	 HAL_UART_Transmit(&huart1, &rs_buftx, 4, TIME_OUT);
 	 	  	 	  }
+					htim3.Instance->CCR2=c1;
 
-	  	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
 
-	  	  //HAL_UART_Transmit(&huart1, &state, strlen(state), TIME_OUT);
-	  	  //HAL_Delay(1000);
-
-	  	 /*if (HAL_UART_Receive(&huart1, rs_buftx, 1, TIME_OUT)==HAL_OK)
-	  	  {
-				  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-				  HAL_Delay(1000);
-				  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-				  HAL_Delay(1000);
-	 	  }*/
 
 
     /* USER CODE END WHILE */
