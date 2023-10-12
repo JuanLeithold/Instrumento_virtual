@@ -19,17 +19,17 @@ MainWindow::~MainWindow() //Destructor
     delete ui;
 }
 
-void MainWindow::actualizarTexto(const QString &texto)
+void MainWindow::actualizarTexto(const QString &texto)  //Cambia texto de display
 {
     ui->rxDisplay->setText(texto);
 }
 
-void MainWindow::actualizarLCD(int data)
+void MainWindow::actualizarLCD(int data)                //Cambia valores del display numerico
 {
     ui->lcdNumber->display(data);
 }
 
-void MainWindow::dialTx(int indice)
+void MainWindow::dialTx(int indice)                     //Envia las cuentas a la BP del duty
 {
     char data_c [sizeof(int)];
     QString tension;
@@ -57,7 +57,7 @@ void MainWindow::dialTx(int indice)
     }
 }
 
-void MainWindow::serialRead()
+void MainWindow::serialRead()                           //Lee las cuentas que llegan de la BP
 {
     char buffer[sizeof(int)];
     int enteroRecibido;

@@ -12,12 +12,14 @@ SOURCES += \
     analogoutput.cpp \
     main.cpp \
     mainwindow.cpp \
-    serialcomunication.cpp
+    serialcomunication.cpp \
+    threads.cpp
 
 HEADERS += \
     analogoutput.h \
     mainwindow.h \
-    serialcomunication.h
+    serialcomunication.h \
+    threads.h
 
 FORMS += \
     mainwindow.ui
