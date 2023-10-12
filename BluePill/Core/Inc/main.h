@@ -59,7 +59,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
-#define PWM1_Pin GPIO_PIN_7
+#define PWM1_Pin GPIO_PIN_6
 #define PWM1_GPIO_Port GPIOA
 #define MUXC_Pin GPIO_PIN_13
 #define MUXC_GPIO_Port GPIOB

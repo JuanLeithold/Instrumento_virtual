@@ -25,7 +25,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "rs485.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -48,7 +47,15 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+char arreglo [5];
+char arreglo2 [5];
+union union_var
+{
+	int x;
+	char arreglo[4];
+};
+int position=0;
+int ready = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,12 +66,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-union union_var{
 
-	int x;
-	char arreglo[4];
-
-};
 /* USER CODE END 0 */
 
 /**
@@ -86,7 +88,7 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-  MX_TIM3_Init();
+
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -95,37 +97,41 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
+  MX_TIM4_Init();
+  MX_TIM2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-
-/*Delaracion de variables*/
-
+    HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+   HAL_TIM_Base_Start_IT(&htim4);
+   HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
 	 	 HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);// Para rx
 
 	 	  if (HAL_UART_Receive(&huart1, &rs_buftx, 4, TIME_OUT)==HAL_OK)
 	 	  	  	  {
-	 		  	  	 HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	 		  	  	// HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 	 		  	  	 for (int i=0; i<4;i++)
 	 		  	  	 {
 	 		  	  		 aux.arreglo[i]=rs_buftx[i];
 	 		  	  	 }
 	 		  	  	 c1 = aux.x;
-	 		  	  	 HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
-	 		  	  	 HAL_UART_Transmit(&huart1, &rs_buftx, 4, TIME_OUT);
+	 		  	  HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
+	 		  	  HAL_UART_Transmit(&huart1, &rs_buftx, 4, TIME_OUT);
 	 	  	 	  }
-					htim3.Instance->CCR2=c1;
+					htim3.Instance->CCR1=c1;
+
 
 
 
@@ -177,6 +183,41 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+
+
+	if (htim->Instance == TIM4) {
+
+		if (position <5)
+		{
+			arreglo[position] = position;
+			position++;
+		}
+		else
+		{
+			position=0;
+			ready=1;
+		}
+	}
+		if (htim->Instance == TIM2) {
+
+			 if (ready)
+				  {
+				      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+					  for (int i=0; i<5; i++)
+					  {
+						  arreglo2[i] = arreglo[i];
+					  }
+					  ready=0;
+					  //HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
+					  //HAL_UART_Transmit(&huart1, &arreglo2, 5, TIME_OUT);
+					 //HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
+
+				  }
+
+
+    }
+}
 
 /* USER CODE END 4 */
 

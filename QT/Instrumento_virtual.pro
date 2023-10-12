@@ -9,11 +9,15 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    analogoutput.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    serialcomunication.cpp
 
 HEADERS += \
-    mainwindow.h
+    analogoutput.h \
+    mainwindow.h \
+    serialcomunication.h
 
 FORMS += \
     mainwindow.ui
