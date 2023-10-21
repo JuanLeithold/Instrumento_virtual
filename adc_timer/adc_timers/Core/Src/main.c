@@ -59,7 +59,7 @@ static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
-
+void MUX_SelectChannel(int );
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -317,9 +317,13 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, EN_Pin|MUXC_Pin|MUXB_Pin|MUXA_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
@@ -327,6 +331,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : EN_Pin MUXC_Pin MUXB_Pin MUXA_Pin */
+  GPIO_InitStruct.Pin = EN_Pin|MUXC_Pin|MUXB_Pin|MUXA_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -337,9 +348,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 
 	if (htim->Instance == TIM4) {
+
 		 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 		 for(int i=0;i<8;i++)
 		 {
+		MUX_SelectChannel(i);
 		adc_val[i]= HAL_ADC_GetValue(&hadc1);
 		  printf("Valor del ADC: %d\n", adc_val[i]);
 		 }/*if (position <10)kkkkkk
@@ -373,6 +386,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 
     }
+}
+
+
+void MUX_SelectChannel(canal ){
+
+	switch (canal)
+	case 0:
 }
 
 /* USER CODE END 4 */
