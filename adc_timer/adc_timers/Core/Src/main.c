@@ -46,7 +46,7 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
-uint32_t adc_val;
+uint32_t adc_val[8];
 uint32_t adc_val1;
 int position=0;
 int ready = 0;
@@ -337,10 +337,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 
 	if (htim->Instance == TIM4) {
-		adc_val= HAL_ADC_GetValue(&hadc1);
-		  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		  printf("Valor del ADC: %d\n", adc_val);
-		/*if (position <10)
+		 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		 for(int i=0;i<8;i++)
+		 {
+		adc_val[i]= HAL_ADC_GetValue(&hadc1);
+		  printf("Valor del ADC: %d\n", adc_val[i]);
+		 }/*if (position <10)kkkkkk
 		{
 
 			position++;

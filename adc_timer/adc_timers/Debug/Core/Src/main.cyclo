@@ -4,5 +4,5 @@ main.c:174:13:MX_ADC1_Init	3
 main.c:221:13:MX_TIM2_Init	4
 main.c:266:13:MX_TIM4_Init	4
 main.c:311:13:MX_GPIO_Init	1
-main.c:336:6:HAL_TIM_PeriodElapsedCallback	2
-main.c:382:6:Error_Handler	1
+main.c:336:6:HAL_TIM_PeriodElapsedCallback	3
+main.c:384:6:Error_Handler	1
