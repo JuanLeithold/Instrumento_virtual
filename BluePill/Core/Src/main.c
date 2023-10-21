@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -47,23 +48,15 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
-char arreglo2 [64];
-
-const char QT_addres []= "0xA0";
+char arreglo [5];
+char arreglo2 [5];
 union union_var
 {
-	uint8_t x;
+	int x;
 	char arreglo[4];
 };
-
+int position=0;
 int ready = 0;
-uint8_t analog_input [16];
-	uint8_t digital_input[8]={1,0,1,0,1,0,1,0};
-	uint8_t bufTx [24];
-	int j;
-	int position=0;
-	int data;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -114,6 +107,7 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
     HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
    HAL_TIM_Base_Start_IT(&htim4);
@@ -124,8 +118,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-	 	/* HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);// Para rx
+//DEJAR ASI!
+	 	 HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);// Para rx
 
 	 	  if (HAL_UART_Receive(&huart1, &rs_buftx, 4, TIME_OUT)==HAL_OK)
 	 	  	  	  {
@@ -139,8 +133,8 @@ int main(void)
 	 		  	  HAL_UART_Transmit(&huart1, &rs_buftx, 4, TIME_OUT);
 	 	  	 	  }
 					htim3.Instance->CCR1=c1;
+//HASTA ACA
 
-*/
 
 
 
@@ -159,6 +153,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -188,21 +183,23 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 
+	if (htim->Instance == TIM4) {
 
-	if (htim->Instance == TIM4)
-	{
-
-		if (position <8)
+		if (position <5)
 		{
-			data = position*100;
-			analog_input[position*2] = (uint8_t)(0xff & (data>>8));
-			analog_input[(position*2)+1]=(uint8_t)(0xff & data);
+			arreglo[position] = position;
 			position++;
 		}
 		else
@@ -211,32 +208,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			ready=1;
 		}
 	}
+		if (htim->Instance == TIM2) {
 
-
-		 if (ready)
-			  {
-			 	 j=0;
-				  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-				  for (int i = 0; i < 24; i++)
+			 if (ready)
 				  {
-					if(i<16)
-					{
-						bufTx[i]= analog_input[i];
-					}
-					else
-					{
-						bufTx[i] = digital_input[j];
-						j++;
-					}
+				      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+					  for (int i=0; i<5; i++)
+					  {
+						  arreglo2[i] = arreglo[i];
+					  }
+					  ready=0;
+					  //HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
+					  //HAL_UART_Transmit(&huart1, &arreglo2, 5, TIME_OUT);
+					 //HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
+
 				  }
-
-
-				  ready=0;
-				  HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
-				  HAL_UART_Transmit(&huart1, &bufTx, 24, TIME_OUT);
-				 //HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
-
-
 
 
     }
