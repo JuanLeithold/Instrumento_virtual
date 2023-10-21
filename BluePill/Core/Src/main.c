@@ -211,8 +211,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			ready=1;
 		}
 	}
-	if (htim->Instance == TIM2)
-	{
+
 
 		 if (ready)
 			  {
@@ -237,7 +236,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 				  HAL_UART_Transmit(&huart1, &bufTx, 24, TIME_OUT);
 				 //HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
 
-			  }
+
 
 
     }
