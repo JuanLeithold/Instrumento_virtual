@@ -64,6 +64,37 @@ void MUX_SelectChannel(int );
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void MUX_SelectChannel(canal ){
+
+	switch (canal){
+	case 0:
+				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				 break;
+	case 1:
+				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				 break;
+	case 2:
+				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				 break;
+	case 3:
+				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				 break;
+	case 4:
+				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				 break;
+	case 5:
+				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				 break;
+	case 6:
+				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				 break;
+	case 7:
+				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				 break;
+
+	}
+}
+
 
 /* USER CODE END 0 */
 
@@ -202,7 +233,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_6;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -388,12 +419,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     }
 }
 
-
-void MUX_SelectChannel(canal ){
-
-	switch (canal)
-	case 0:
-}
 
 /* USER CODE END 4 */
 
