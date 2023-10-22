@@ -50,6 +50,7 @@ uint32_t adc_val[8];
 uint32_t adc_val1;
 int position=0;
 int ready = 0;
+int canal;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -64,32 +65,36 @@ void MUX_SelectChannel(int );
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void MUX_SelectChannel(canal ){
+
+	void MUX_SelectChannel(canal){
 
 	switch (canal){
 	case 0:
-				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+			 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+			 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH0
 				 break;
 	case 1:
-				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		HAL_GPIO_TogglePin(MUXC_GPIO_Port, MUXC_Pin);//001 CH1
+
 				 break;
 	case 2:
-				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		HAL_GPIO_TogglePin(MUXB_GPIO_Port, MUXB_Pin);//011 CH3
 				 break;
 	case 3:
-				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		HAL_GPIO_TogglePin(MUXC_GPIO_Port, MUXC_Pin);//010 CH2
 				 break;
 	case 4:
-				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		HAL_GPIO_TogglePin(MUXA_GPIO_Port, MUXA_Pin);//110 CH6
 				 break;
 	case 5:
-				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		HAL_GPIO_TogglePin(MUXC_GPIO_Port, MUXC_Pin);//111 CH7
 				 break;
 	case 6:
-				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		HAL_GPIO_TogglePin(MUXB_GPIO_Port, MUXB_Pin);//101 CH5
 				 break;
 	case 7:
-				 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		HAL_GPIO_TogglePin(MUXC_GPIO_Port, MUXC_Pin);//100 CH4
 				 break;
 
 	}
@@ -141,8 +146,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	 adc_val1=adc_val;
-	  printf("Valor del ADC: %d\n", adc_val1);
+
 
     /* USER CODE END WHILE */
 
@@ -233,7 +237,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_6;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -377,7 +381,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
-
+	 HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, GPIO_PIN_RESET);
 	if (htim->Instance == TIM4) {
 
 		 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
@@ -386,7 +390,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		MUX_SelectChannel(i);
 		adc_val[i]= HAL_ADC_GetValue(&hadc1);
 		  printf("Valor del ADC: %d\n", adc_val[i]);
-		 }/*if (position <10)kkkkkk
+		 }/*if (position <10)
 		{
 
 			position++;
