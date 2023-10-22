@@ -1,11 +1,11 @@
 #MicroXplorer Configuration settings - do not modify
-ADC1.Channel-1\#ChannelRegularConversion=ADC_CHANNEL_6
-ADC1.ContinuousConvMode=ENABLE
-ADC1.IPParameters=master,Rank-1\#ChannelRegularConversion,Channel-1\#ChannelRegularConversion,SamplingTime-1\#ChannelRegularConversion,NbrOfConversionFlag,ContinuousConvMode,NbrOfConversion
+ADC1.Channel-2\#ChannelRegularConversion=ADC_CHANNEL_6
+ADC1.ContinuousConvMode=DISABLE
+ADC1.IPParameters=Rank-2\#ChannelRegularConversion,master,Channel-2\#ChannelRegularConversion,SamplingTime-2\#ChannelRegularConversion,NbrOfConversionFlag,ContinuousConvMode,NbrOfConversion
 ADC1.NbrOfConversion=1
 ADC1.NbrOfConversionFlag=1
-ADC1.Rank-1\#ChannelRegularConversion=1
-ADC1.SamplingTime-1\#ChannelRegularConversion=ADC_SAMPLETIME_239CYCLES_5
+ADC1.Rank-2\#ChannelRegularConversion=1
+ADC1.SamplingTime-2\#ChannelRegularConversion=ADC_SAMPLETIME_239CYCLES_5
 ADC1.master=1
 CAD.formats=
 CAD.pinconfig=
@@ -144,7 +144,7 @@ TIM2.Period=2000
 TIM2.Prescaler=7200-1
 TIM2.TIM_MasterOutputTrigger=TIM_TRGO_RESET
 TIM4.IPParameters=TIM_MasterOutputTrigger,Prescaler,Period
-TIM4.Period=3000
+TIM4.Period=1000
 TIM4.Prescaler=7200 -1
 TIM4.TIM_MasterOutputTrigger=TIM_TRGO_RESET
 VP_TIM2_VS_ClockSourceINT.Mode=Internal

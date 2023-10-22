@@ -75,26 +75,39 @@ void MUX_SelectChannel(int );
 			 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH0
 				 break;
 	case 1:
-		HAL_GPIO_TogglePin(MUXC_GPIO_Port, MUXC_Pin);//001 CH1
-
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH1
 				 break;
 	case 2:
-		HAL_GPIO_TogglePin(MUXB_GPIO_Port, MUXB_Pin);//011 CH3
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH2
 				 break;
 	case 3:
-		HAL_GPIO_TogglePin(MUXC_GPIO_Port, MUXC_Pin);//010 CH2
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH3
 				 break;
 	case 4:
-		HAL_GPIO_TogglePin(MUXA_GPIO_Port, MUXA_Pin);//110 CH6
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH4
 				 break;
 	case 5:
-		HAL_GPIO_TogglePin(MUXC_GPIO_Port, MUXC_Pin);//111 CH7
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH5
 				 break;
 	case 6:
-		HAL_GPIO_TogglePin(MUXB_GPIO_Port, MUXB_Pin);//101 CH5
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH6
 				 break;
 	case 7:
-		HAL_GPIO_TogglePin(MUXC_GPIO_Port, MUXC_Pin);//100 CH4
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH7
 				 break;
 
 	}
@@ -135,8 +148,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  if(HAL_ADC_Start_IT(&hadc1) != HAL_OK)
- 	  Error_Handler();
+
 
   HAL_TIM_Base_Start_IT(&htim4);
    HAL_TIM_Base_Start_IT(&htim2);
@@ -223,7 +235,7 @@ static void MX_ADC1_Init(void)
   */
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -314,7 +326,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 7200 -1;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 3000;
+  htim4.Init.Period = 1000;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -388,8 +400,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		 for(int i=0;i<8;i++)
 		 {
 		MUX_SelectChannel(i);
+		 HAL_ADC_Start(&hadc1);
+		 HAL_ADC_PollForConversion(&hadc1,HAL_MAX_DELAY);
 		adc_val[i]= HAL_ADC_GetValue(&hadc1);
-		  printf("Valor del ADC: %d\n", adc_val[i]);
+		HAL_ADC_Stop(&hadc1);
 		 }/*if (position <10)
 		{
 
