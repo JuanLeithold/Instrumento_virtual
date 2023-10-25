@@ -5,7 +5,6 @@
 
 struct analogOutputStruct
 {
-    int index;
     QString value;
     int dutyAccounts;
 

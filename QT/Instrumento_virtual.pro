@@ -13,13 +13,13 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     serialcomunication.cpp \
-    threads.cpp
+    comunicationthread.cpp
 
 HEADERS += \
     analogoutput.h \
     mainwindow.h \
     serialcomunication.h \
-    threads.h
+    comunicationthread.h
 
 FORMS += \
     mainwindow.ui
@@ -28,3 +28,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    imagenes.qrc

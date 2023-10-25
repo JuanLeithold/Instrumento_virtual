@@ -1,5 +1,5 @@
 #include "serialcomunication.h"
-
+#include <QDebug>
 serialComunication::serialComunication(QObject *parent)
     : QObject{parent}
 {
@@ -16,4 +16,5 @@ void serialComunication::portInit()
     serial ->setStopBits    (QSerialPort::OneStop);
     serial ->setFlowControl (QSerialPort::NoFlowControl);
     serial ->open           (QIODevice::ReadWrite);
+    qDebug() << "Conectado al puerto serie" << serial->portName();
 }

@@ -30,8 +30,24 @@
 #include <time.h>
 /* USER CODE END Includes */
 
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+
 /* USER CODE BEGIN PV */
-/*Estructura para almacenar los datos a transmitir con su respectiva variable declarada*/
 typedef struct {
   // Byte de caebcera.
   uint8_t header;
@@ -47,10 +63,7 @@ typedef struct {
   // 8 entradas digitales.
   uint8_t digitalInputs;
 
-} txStruct_t;
-txStruct_t txBufferStruct;
-
-/*Estructura para almacenar los datos recibidos con su respectiva variable declarada*/
+} txBuffer_t; //Fin de struct
 typedef struct {
   // 8 entradas analógicas (12 bits).
   uint8_t analogOutput1;
@@ -58,24 +71,19 @@ typedef struct {
   // 8 salidas digitales.
   uint8_t digitalOutputs;
 
-} rxStruct_t; //Fin de struct
-rxStruct_t rxBufferStruct;
+} rxBuffer_t; //Fin de struct
 
-/*Union para manejar los datos a transmitir con su respectiva variable declarada*/
 typedef union
 {
-  txStruct_t txBuffer;
+  txBuffer_t txBuffer;
   char    txBuffer_c[18];
 } unionTx_t; //Fin de union
-unionTx_t txBufferUnion;
 
-/*Union para manejar los datos recibidos con su respectiva variable declarada*/
 typedef union
 {
-  rxStruct_t rxUnionBuffer;
+  rxBuffer_t rxBuffer;
   char    rxBuffer_c[3];
 } unionRx_t; //Fin de union
-unionRx_t rxUnion;
 
 const char QT_addres []= "0x1C";
 
@@ -100,13 +108,17 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	txBuffer_t txBuffer;
 	static uint16_t adcRead;
 	int contador =1;
 	int readyToSend=0;
 
-	txBufferStruct.header = 0x1c;
-	txBufferStruct.digitalInputs = 0xf0;
+	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+	HAL_TIM_Base_Start_IT(&htim2);
+
+	srand(time(NULL));
+	txBuffer.header = 0x1c;
+	txBuffer.digitalInputs = 0xf0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -128,18 +140,14 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
+  MX_TIM2_Init();
   MX_TIM3_Init();
-  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
-  HAL_TIM_Base_Start_IT(&htim4);
-  HAL_TIM_Base_Start_IT(&htim3);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  	HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
-  	HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
 	int countingDown;
 	while (1)
 	{
@@ -152,31 +160,31 @@ int main(void)
 			adcRead--;
 		else
 			adcRead++;
-
+/*
 		switch (contador)
 		{
-			case 1: txBufferStruct.analogInput1 = adcRead; break;
-			case 2: txBufferStruct.analogInput2 = adcRead; break;
-			case 3: txBufferStruct.analogInput3 = adcRead; break;
-			case 4: txBufferStruct.analogInput4 = adcRead; break;
-			case 5: txBufferStruct.analogInput5 = adcRead; break;
-			case 6: txBufferStruct.analogInput6 = adcRead; break;
-			case 7: txBufferStruct.analogInput7 = adcRead; break;
+			case 1: txBuffer.analogInput1 = adcRead; break;
+			case 2: txBuffer.analogInput2 = adcRead; break;
+			case 3: txBuffer.analogInput3 = adcRead; break;
+			case 4: txBuffer.analogInput4 = adcRead; break;
+			case 5: txBuffer.analogInput5 = adcRead; break;
+			case 6: txBuffer.analogInput6 = adcRead; break;
+			case 7: txBuffer.analogInput7 = adcRead; break;
 			case 8:
 			{
-				txBufferStruct.analogInput8 = adcRead;
+				txBuffer.analogInput8 = adcRead;
 				readyToSend=1;
 				break;
 			}
 		}
 		contador++;
-
+*/
 		if(readyToSend)
 		{
 			contador=0;
 			readyToSend=0;
 			HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);			//Se programa Modul RS485 para Tx
-			HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
+	//		HAL_UART_Transmit(&huart1, (uint8_t*)&txBuffer, sizeof(txBuffer), TIME_OUT);
 		}
     /* USER CODE END WHILE */
 
@@ -226,44 +234,27 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 uint8_t rxBuffer[3];
-uint8_t data;
 int c1=0;
 int c2=0;
-int counter=0;
 uint8_t digitalOutput;
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	if (huart->Instance == USART1){}
-	HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
-	HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
-}
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	//HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
-	//if (htim->Instance == TIM4)
-	/*{
-		HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET); //Se programa RS485 para recepcion
 
-			if (HAL_UART_Receive(&huart1, data, 1, 500)== HAL_OK)
+	if (htim->Instance == TIM2)
+	{
+		HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET); //Se programa RS485 para recepcion
+		if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
+		{
+			if (HAL_UART_Receive(&huart1,rxBuffer, 3, TIME_OUT)==HAL_OK)
 			{
 			 // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-				rxBuffer[counter]= data;
-				if(counter<3)
-				{
-					counter++;
-				}
-				else
-				{
-					counter=0;
-				}
-				//c1 = rxBuffer[0];
-				//c2 = rxBuffer[1];
-				//digitalOutput = rxBuffer [2];
+				c1 = rxBuffer[0];
+				c2 = rxBuffer[1];
+				digitalOutput = rxBuffer [2];
 			}
 			htim3.Instance->CCR1=c1;
-*/
-	//}
+		}
+	}
 }
 
 
