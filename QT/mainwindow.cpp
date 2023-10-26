@@ -50,7 +50,7 @@ MainWindow::~MainWindow() //Destructor
 
 void MainWindow::PWM1dialChange(int indice)
 {
-    char data_c [sizeof(int)];
+
     QString tension;
     int duty;
 
@@ -67,7 +67,7 @@ void MainWindow::PWM1dialChange(int indice)
 }
 void MainWindow::PWM2dialChange(int indice)
 {
-    char data_c [sizeof(int)];
+
     QString tension;
     int duty;
 
@@ -175,7 +175,7 @@ void MainWindow::displayRxData(const unionRx_t &data)
     uint8_t digitalInputs = data.txBuffer.digitalInputs;
     QString text = QString::number(digitalInputs, 2);
     qDebug()<< "digitalInputs: "<< text;
-    uint8_t mask;
+
     ui->AN1->display(data.txBuffer.analogInput1);
     ui->AN2->display(data.txBuffer.analogInput2);
     ui->AN3->display(data.txBuffer.analogInput3);

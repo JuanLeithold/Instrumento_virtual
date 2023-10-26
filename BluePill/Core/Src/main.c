@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -31,6 +32,7 @@
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */
+
 /*Estructura para almacenar los datos a transmitir con su respectiva variable declarada*/
 typedef struct {
   // Byte de caebcera.
@@ -77,9 +79,6 @@ typedef union
 } unionRx_t; //Fin de union
 unionRx_t rxUnion;
 
-const char QT_addres []= "0x1C";
-
-int ready = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,25 +87,17 @@ void SystemClock_Config(void);
 
 /* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
 
-/* USER CODE END 0 */
-
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
 
 	static uint16_t adcRead;
-	int contador =1;
+	int adcInputCounter =1;		//Contador para ir seleccionando diferentes lecturas del adc y modificar el mux
 	int readyToSend=0;
 
-	txBufferStruct.header = 0x1c;
-	txBufferStruct.digitalInputs = 0xf0;
+	txBufferStruct.header = 0x1c;			//Cabecera para que QT dicierna que datos son correctos
+	txBufferStruct.digitalInputs = 0xf0;	//valor de prueba
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -130,6 +121,8 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
+  MX_ADC1_Init();
+
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
   HAL_TIM_Base_Start_IT(&htim4);
@@ -138,11 +131,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  	HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
-  	HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
-	int countingDown;
-	while (1)
-	{
+  	HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);				//Para utilizar modulo rs485 en rx
+  	HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));	//para recepcion de la blue pil. Esta en proceso.
+
+  	 int countingDown;
+  	 while (1)
+  	  {
 		if	(adcRead==100)
 			countingDown=1;
 		if (adcRead==0)
@@ -153,7 +147,7 @@ int main(void)
 		else
 			adcRead++;
 
-		switch (contador)
+		switch (adcInputCounter)
 		{
 			case 1: txBufferStruct.analogInput1 = adcRead; break;
 			case 2: txBufferStruct.analogInput2 = adcRead; break;
@@ -169,11 +163,11 @@ int main(void)
 				break;
 			}
 		}
-		contador++;
+		adcInputCounter++;
 
 		if(readyToSend)
 		{
-			contador=0;
+			adcInputCounter=0;
 			readyToSend=0;
 			HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);			//Se programa Modul RS485 para Tx
 			HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
@@ -189,10 +183,12 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
+
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -222,6 +218,12 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
 /* USER CODE BEGIN 4 */
@@ -234,36 +236,17 @@ uint8_t digitalOutput;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	/*//funciones para poner en el callback. Hablar con dani
 	if (huart->Instance == USART1){}
-	HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
-	HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
+		HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
+		HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
+	*/
 }
+
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	//HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
-	//if (htim->Instance == TIM4)
-	/*{
-		HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET); //Se programa RS485 para recepcion
 
-			if (HAL_UART_Receive(&huart1, data, 1, 500)== HAL_OK)
-			{
-			 // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-				rxBuffer[counter]= data;
-				if(counter<3)
-				{
-					counter++;
-				}
-				else
-				{
-					counter=0;
-				}
-				//c1 = rxBuffer[0];
-				//c2 = rxBuffer[1];
-				//digitalOutput = rxBuffer [2];
-			}
-			htim3.Instance->CCR1=c1;
-*/
-	//}
 }
 
 
@@ -300,3 +283,54 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
+/****************************************************************************/
+/***************CODIGOS VIEJOS POR SI HACE FALTA REFERENCIA******************/
+/****************************************************************************/
+
+/********** Codigo que estaba dentro del while para recibir el dial de Qt**********/
+/*
+	 	 HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);// Para rx
+
+	 	  if (HAL_UART_Receive(&huart1, &rs_buftx, 4, TIME_OUT)==HAL_OK)
+	 	  	  	  {
+	 		  	  	// HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	 		  	  	 for (int i=0; i<4;i++)
+	 		  	  	 {
+	 		  	  		 aux.arreglo[i]=rs_buftx[i];
+	 		  	  	 }
+	 		  	  	 c1 = aux.x;
+	 		  	  HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
+	 		  	  HAL_UART_Transmit(&huart1, &rs_buftx, 4, TIME_OUT);
+	 	  	 	  }
+					htim3.Instance->CCR1=c1;
+*/
+
+/********** Codigo de interrupcionens que estaba dentro de HAL_TIM_PeriodElapsedCallback().**********/
+/*******************De momento se evalua si sera necesario usar interrupciones***********************/
+
+//HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
+	//if (htim->Instance == TIM4)
+	/*{
+		HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET); //Se programa RS485 para recepcion
+
+			if (HAL_UART_Receive(&huart1, data, 1, 500)== HAL_OK)
+			{
+			 // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+				rxBuffer[counter]= data;
+				if(counter<3)
+				{
+					counter++;
+				}
+				else
+				{
+					counter=0;
+				}
+				//c1 = rxBuffer[0];
+				//c2 = rxBuffer[1];
+				//digitalOutput = rxBuffer [2];
+			}
+
+}			htim3.Instance->CCR1=c1;
+*/
+

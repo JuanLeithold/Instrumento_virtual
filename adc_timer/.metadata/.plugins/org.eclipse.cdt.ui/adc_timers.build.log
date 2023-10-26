@@ -1,0 +1,10 @@
+22:33:55 **** Incremental Build of configuration Debug for project adc_timers ****
+make -j16 all 
+arm-none-eabi-size   adc_timers.elf 
+   text	   data	    bss	    dec	    hex	filename
+  14460	    120	   1792	  16372	   3ff4	adc_timers.elf
+Finished building: default.size.stdout
+ 
+
+22:33:55 Build Finished. 0 errors, 0 warnings. (took 218ms)
+

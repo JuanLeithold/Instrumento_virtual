@@ -1,7 +1,12 @@
+/*********************************************************************/
+/*****Clase para manejar la comunicacion serial con hilos*************/
+/*********************************************************************/
+
+
 #include "comunicationthread.h"
 #include <QDebug>
 #include <QString>
-comunicationThread::comunicationThread()
+comunicationThread::comunicationThread() //Constructor. Estado inicial de variables, conexiones y configuraciones.
 {
    // connect (_mainwindow, SIGNAL(digitalOutputChange), this, SLOT(digitalOutputChange()));
 
@@ -10,12 +15,12 @@ comunicationThread::comunicationThread()
       con el sistema de señales y slots de Qt y otros mecanismos de metatipos.
       Esto permite que objetos de ese tipo de dato sean transmitidos correctamente
       a través de señales y slots de Qt.*/
-    rxBuffer.header = 0x1c;
 
-    headerArray.append(rxBuffer.header);
+    rxBuffer.header = 0x1c;                 //header para identificar datos validos que vienen por puerto serial
+    headerArray.append(rxBuffer.header);    //header array es tipo byte array. Se le da el valor del header declarado. Es la variable que se usa para chequear el header obtenido de la comunicacion
 
 }
-comunicationThread::~comunicationThread()
+comunicationThread::~comunicationThread() // Destructor.
 {
     if (_serial.serial->isOpen())
     {
@@ -24,12 +29,9 @@ comunicationThread::~comunicationThread()
 }
 
 
-void comunicationThread::run()
+void comunicationThread::run() //Operaciones que se van a ejecutar en el hilo en paralelo.
 {
-    //Operaciones que se van a ejecutar en paralelo.
-    rxBuffer_t  rxBuffer;
-    unionRx_t   unionBuffer;
-
+    unionRx_t   unionBuffer; // Variable de la union de recepcion donde se almacenaran los datos recibidos
 
     dataBuffer.clear();
     bytesReceived = 0;
@@ -40,20 +42,21 @@ void comunicationThread::run()
         if(_serial.serial->waitForReadyRead(100))
         {
             //if (serialTx())
-            ///{
-            qDebug()<<"Leyendo";
+            //{
+                qDebug()<<"Leyendo";
                 data = _serial.serial->read(1);
 
                 if (data == headerArray )
                 {
+                    dataBuffer.append(data);
                     qDebug()<<"header Encontrado";
+                    bytesReceived++;
                     do
                     {
-                         qDebug()<<"Leyendo data Buena";
+                        qDebug()<<"Leyendo data Buena";
+                        data = _serial.serial->read(1);
                         bytesReceived++;
                         dataBuffer.append(data);
-                        data = _serial.serial->read(1);
-
                     }while (bytesReceived < sizeof(rxBuffer_t));
                 }
                 else
@@ -68,68 +71,25 @@ void comunicationThread::run()
                         memcpy(unionBuffer.txBuffer_c, dataBuffer.constData(), sizeof(rxBuffer_t));
                     }
                     emit dataReceived(unionBuffer); // Emite la trama recibida
+
                     qDebug() << "\n Trama recibida: " << QByteArray(unionBuffer.txBuffer_c, sizeof(rxBuffer_t));
                     dataBuffer.clear();
                     bytesReceived = 0;
                 }
-
-
-
-          //  }
-       }
-    }
-    //}*/
-}
-       /* if(_serial.serial->waitForReadyRead(200))
-        {qDebug()<<"asd";
-            QByteArray requestData = _serial.serial->readAll();
-            qDebug()<< requestData;
-            //qDebug()<< sizeof(requestData);
-
-            for (int i=0; i<24; i++)
-            {
-                qDebug()<< requestData[i];
-                //memcpy(&analog_input[i], &requestData[i*2], 2 );
-                //qDebug()<< analog_input[i];
-            }
-            while (_serial.serial->waitForReadyRead(100))
-            {
-                qDebug()<< requestData;
-                requestData += _serial.serial->readAll();
-            }
-            //const QString request = QString::fromUtf8(requestData);
-           // emit this->request(request);*/
-
-
-/*
-        if(_serial.serial->waitForReadyRead(100))
-        {
-            if (_serial.serial->read(buffer, 24))
-            {
-                for (int i=0; i<8; i++)
-                {
-                    analog_input[i]= ((uint8_t)(buffer[i*2]) << 8) | (uint8_t)(buffer [(i*2)+1]);
-                    qDebug() << analog_input[i];
-                }
-
-                qDebug() << "Trama";
-            }
-            else
-            {
-                qDebug()<<"no se recibio nada";
-            }
+            //}
         }
-*/
+    }
+} // Final del Run
+
 bool comunicationThread::serialTx(void)
 {
     char    txBuffer[3];
-
 
     txBuffer[0]= pwmDuty1;
     txBuffer[1]= pwmDuty2;
     txBuffer[3]= digitalOutputs;
 
-     QByteArray byteArray(reinterpret_cast<const char*>(&txBuffer), sizeof(txBuffer));
+     QByteArray byteArray(reinterpret_cast<const char*>(&txBuffer), sizeof(txBuffer)); // Se convierte arreglo char en BytesArray
 
     if (_serial.serial->isWritable())
     {
@@ -145,9 +105,10 @@ bool comunicationThread::serialTx(void)
        qDebug() << "No se envia nada";
         return 0;
     }
+    return 0;
 }
 
-void comunicationThread::digitalOutputChange(uint8_t dChange)
+void comunicationThread::digitalOutputChange(uint8_t dChange) //Cambia las salidas digitales segun lo que se requiera en la interfaz
 {
     digitalOutputs = digitalOutputs ^ dChange;
     QString text = QString::number(digitalOutputs, 2);
@@ -155,13 +116,13 @@ void comunicationThread::digitalOutputChange(uint8_t dChange)
     emit changeText(text);
 }
 
-void comunicationThread::analogOutput1Change(uint8_t aChange)
+void comunicationThread::analogOutput1Change(uint8_t aChange) //Cambia las cuentas del PWM1 segun lo que se requiera en la interfaz
 {
     pwmDuty1=aChange;
     qDebug()<<"cuetnas del duty 1: "<< pwmDuty1;
 }
 
-void comunicationThread::analogOutput2Change(uint8_t aChange)
+void comunicationThread::analogOutput2Change(uint8_t aChange)//Cambia las cuentas del PWM1 segun lo que se requiera en la interfaz
 {
     pwmDuty2=aChange;
     qDebug()<<"cuetnas del duty 2: "<< pwmDuty2;
