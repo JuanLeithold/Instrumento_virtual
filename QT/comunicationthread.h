@@ -29,9 +29,27 @@ typedef struct
 
 typedef union
 {
-    rxBuffer_t txBuffer;
-    char    txBuffer_c[18];
+    rxBuffer_t rxBuffer;
+    char    rxBuffer_c[sizeof(rxBuffer_t)];
 } unionRx_t; //Union de Recepcion de datos
+
+typedef struct
+{
+    // Byte de caebcera.
+    uint8_t header;
+    // 8 entradas analógicas (12 bits).
+    uint8_t analogOutput1;
+    uint8_t analogOutput2;
+    // 8 entradas digitales.
+    uint8_t digitalOutputs;
+
+} txBuffer_t;//Estructura de Recepcion de datos
+
+typedef union
+{
+    txBuffer_t txBuffer;
+    char    txBuffer_c[sizeof(txBuffer_t)];
+} unionTx_t; //Union de Recepcion de datos
 
 class comunicationThread : public QThread
 {
@@ -43,11 +61,12 @@ public:
     serialComunication _serial;                     //Instancia de la clase de comunicación serial.
 
     rxBuffer_t rxBuffer;                            // Variable de la estructura creada.
+    unionTx_t  unionTx;
     QByteArray headerArray;                         // Variable auxiliar para la comparacion del header recibido por serial.
 
-    uint8_t pwmDuty1=0;                             /*******************************************************/
-    uint8_t pwmDuty2=0;                             /**Variables que almacenaranlos datos a enviar a la BP**/
-    uint8_t digitalOutputs=0b00000000;              /*******************************************************/
+    uint8_t pwmDuty1=50;                             /*******************************************************/
+    uint8_t pwmDuty2=50;                             /**Variables que almacenaranlos datos a enviar a la BP**/
+    uint8_t digitalOutputs;              /*******************************************************/
 
 private:
     QByteArray data;                                // Para recibir de a un byte por puerto serie.
@@ -65,6 +84,7 @@ public slots:
 signals:
     void dataReceived(const unionRx_t &data);       //Señal que se emite cuando se obtienen todos los datos de la recepcion. La señal es detectada por MainWindows
     void changeText (QString &texto);
+    void serialSend(void);
 
 protected:
     void run();

@@ -85,12 +85,12 @@ void MainWindow::PWM2dialChange(int indice)
 void MainWindow::digitalInputChange(uint8_t digitalInputs)
 {
     if ((digitalInputs & 0b10000000)>>7 == 1)
-    {   qDebug()<<"cierto";
+    {   //qDebug()<<"cierto";
         ui->LED1->setPixmap(QPixmap("C:/Users/Juan Leithold/Instrumento_virtual/QT/ledVerde"));
         ui->LED1->setFixedSize(60,60);
     }
     else
-    {qDebug()<<"cierto";
+    {//qDebug()<<"cierto";
         ui->LED1->setPixmap(QPixmap("C:/Users/Juan Leithold/Instrumento_virtual/QT/ledRojo"));
         ui->LED1->setFixedSize(60,60);
     }
@@ -172,18 +172,18 @@ void MainWindow::digitalInputChange(uint8_t digitalInputs)
 
 void MainWindow::displayRxData(const unionRx_t &data)
 {
-    uint8_t digitalInputs = data.txBuffer.digitalInputs;
+    uint8_t digitalInputs = data.rxBuffer.digitalInputs;
     QString text = QString::number(digitalInputs, 2);
-    qDebug()<< "digitalInputs: "<< text;
+    //qDebug()<< "digitalInputs: "<< text;
 
-    ui->AN1->display(data.txBuffer.analogInput1);
-    ui->AN2->display(data.txBuffer.analogInput2);
-    ui->AN3->display(data.txBuffer.analogInput3);
-    ui->AN4->display(data.txBuffer.analogInput4);
-    ui->AN5->display(data.txBuffer.analogInput5);
-    ui->AN6->display(data.txBuffer.analogInput6);
-    ui->AN7->display(data.txBuffer.analogInput7);
-    ui->AN8->display(data.txBuffer.analogInput8);
+    ui->AN1->display(data.rxBuffer.analogInput1);
+    ui->AN2->display(data.rxBuffer.analogInput2);
+    ui->AN3->display(data.rxBuffer.analogInput3);
+    ui->AN4->display(data.rxBuffer.analogInput4);
+    ui->AN5->display(data.rxBuffer.analogInput5);
+    ui->AN6->display(data.rxBuffer.analogInput6);
+    ui->AN7->display(data.rxBuffer.analogInput7);
+    ui->AN8->display(data.rxBuffer.analogInput8);
 
     digitalInputChange(digitalInputs);
 

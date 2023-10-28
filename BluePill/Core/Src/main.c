@@ -55,6 +55,7 @@ txStruct_t txBufferStruct;
 /*Estructura para almacenar los datos recibidos con su respectiva variable declarada*/
 typedef struct {
   // 8 entradas analógicas (12 bits).
+  uint8_t header;
   uint8_t analogOutput1;
   uint8_t analogOutput2;
   // 8 salidas digitales.
@@ -75,7 +76,7 @@ unionTx_t txBufferUnion;
 typedef union
 {
   rxStruct_t rxUnionBuffer;
-  char    rxBuffer_c[3];
+  char    rxBuffer_c[sizeof(rxStruct_t)];
 } unionRx_t; //Fin de union
 unionRx_t rxUnion;
 
@@ -95,9 +96,10 @@ int main(void)
 	static uint16_t adcRead;
 	int adcInputCounter =1;		//Contador para ir seleccionando diferentes lecturas del adc y modificar el mux
 	int readyToSend=0;
+	int digitalDown=0;
 
 	txBufferStruct.header = 0x1c;			//Cabecera para que QT dicierna que datos son correctos
-	txBufferStruct.digitalInputs = 0xf0;	//valor de prueba
+	txBufferStruct.digitalInputs = 0x00;	//valor de i inicio para prueba
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -147,6 +149,7 @@ int main(void)
 		else
 			adcRead++;
 
+
 		switch (adcInputCounter)
 		{
 			case 1: txBufferStruct.analogInput1 = adcRead; break;
@@ -158,7 +161,26 @@ int main(void)
 			case 7: txBufferStruct.analogInput7 = adcRead; break;
 			case 8:
 			{
+				if (txBufferStruct.digitalInputs== 0b11111111)
+				{
+					digitalDown ==1;
+
+				}
+				else if (txBufferStruct.digitalInputs== 0b00000000)
+				{
+					digitalDown ==1;
+				}
+				if (digitalDown)
+				{
+					txBufferStruct.digitalInputs--;
+				}
+				else
+				{
+					txBufferStruct.digitalInputs++;
+				}
+
 				txBufferStruct.analogInput8 = adcRead;
+
 				readyToSend=1;
 				break;
 			}
@@ -171,6 +193,7 @@ int main(void)
 			readyToSend=0;
 			HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);			//Se programa Modul RS485 para Tx
 			HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
+			HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
 		}
     /* USER CODE END WHILE */
 
@@ -236,11 +259,12 @@ uint8_t digitalOutput;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	/*//funciones para poner en el callback. Hablar con dani
-	if (huart->Instance == USART1){}
-		HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
+	//funciones para poner en el callback. Hablar con dani
+	if (huart->Instance == USART1){
 		HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
-	*/
+	}
+
+
 }
 
 

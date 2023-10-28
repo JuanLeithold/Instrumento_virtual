@@ -10,7 +10,9 @@ comunicationThread::comunicationThread() //Constructor. Estado inicial de variab
 {
    // connect (_mainwindow, SIGNAL(digitalOutputChange), this, SLOT(digitalOutputChange()));
 
-    qRegisterMetaType<rxBuffer_t>("rxBuffer_t");
+    qRegisterMetaType <rxBuffer_t>("rxBuffer_t");
+     qRegisterMetaType <unionTx_t>("unionTx_t");
+    qRegisterMetaType <txBuffer_t>("txBuffer_t");
     /*Su propósito es registrar la estructura creada para que pueda ser utilizado
       con el sistema de señales y slots de Qt y otros mecanismos de metatipos.
       Esto permite que objetos de ese tipo de dato sean transmitidos correctamente
@@ -18,7 +20,9 @@ comunicationThread::comunicationThread() //Constructor. Estado inicial de variab
 
     rxBuffer.header = 0x1c;                 //header para identificar datos validos que vienen por puerto serial
     headerArray.append(rxBuffer.header);    //header array es tipo byte array. Se le da el valor del header declarado. Es la variable que se usa para chequear el header obtenido de la comunicacion
-
+    unionTx.txBuffer.analogOutput1  = 0;
+    unionTx.txBuffer.analogOutput2  = 0;
+    connect(this, SIGNAL(serialSend()),this,SLOT(serialTx()));
 }
 comunicationThread::~comunicationThread() // Destructor.
 {
@@ -43,17 +47,17 @@ void comunicationThread::run() //Operaciones que se van a ejecutar en el hilo en
         {
             //if (serialTx())
             //{
-                qDebug()<<"Leyendo";
+                //qDebug()<<"Leyendo";
                 data = _serial.serial->read(1);
 
                 if (data == headerArray )
                 {
                     dataBuffer.append(data);
-                    qDebug()<<"header Encontrado";
+                   // qDebug()<<"header Encontrado";
                     bytesReceived++;
                     do
                     {
-                        qDebug()<<"Leyendo data Buena";
+                        //qDebug()<<"Leyendo data Buena";
                         data = _serial.serial->read(1);
                         bytesReceived++;
                         dataBuffer.append(data);
@@ -68,11 +72,11 @@ void comunicationThread::run() //Operaciones que se van a ejecutar en el hilo en
                 {
                     if(dataBuffer.size() == sizeof(rxBuffer_t))
                     {
-                        memcpy(unionBuffer.txBuffer_c, dataBuffer.constData(), sizeof(rxBuffer_t));
+                        memcpy(unionBuffer.rxBuffer_c, dataBuffer.constData(), sizeof(rxBuffer_t));
                     }
                     emit dataReceived(unionBuffer); // Emite la trama recibida
 
-                    qDebug() << "\n Trama recibida: " << QByteArray(unionBuffer.txBuffer_c, sizeof(rxBuffer_t));
+                    //qDebug() << "\n Trama recibida: " << QByteArray(unionBuffer.rxBuffer_c, sizeof(rxBuffer_t));
                     dataBuffer.clear();
                     bytesReceived = 0;
                 }
@@ -83,26 +87,29 @@ void comunicationThread::run() //Operaciones que se van a ejecutar en el hilo en
 
 bool comunicationThread::serialTx(void)
 {
-    char    txBuffer[3];
+    unionTx.txBuffer.header         = 0x1c;
 
-    txBuffer[0]= pwmDuty1;
-    txBuffer[1]= pwmDuty2;
-    txBuffer[3]= digitalOutputs;
+    unionTx.txBuffer.digitalOutputs = digitalOutputs;
 
-     QByteArray byteArray(reinterpret_cast<const char*>(&txBuffer), sizeof(txBuffer)); // Se convierte arreglo char en BytesArray
+
+     QByteArray byteArray(reinterpret_cast<const char*>(&unionTx), sizeof(unionTx)); // Se convierte arreglo char en BytesArray
 
     if (_serial.serial->isWritable())
     {
-        if(_serial.serial->write(byteArray,3) == sizeof (txBuffer))
+        if(_serial.serial->write(byteArray) == sizeof (unionTx))
         {
            while (_serial.serial->waitForBytesWritten(10)){}
-           qDebug() << "Enviando trama: " << byteArray;
+          //qDebug() << "Enviando trama: " << byteArray;
            return 1;
+        }
+        else
+        {
+           return 0;
         }
     }
     else
     {
-       qDebug() << "No se envia nada";
+       //qDebug() << "No se envia nada";
         return 0;
     }
     return 0;
@@ -113,18 +120,20 @@ void comunicationThread::digitalOutputChange(uint8_t dChange) //Cambia las salid
     digitalOutputs = digitalOutputs ^ dChange;
     QString text = QString::number(digitalOutputs, 2);
     qDebug()<<"digital Output transformado"<< text;
-    emit changeText(text);
+    emit serialSend();
 }
 
 void comunicationThread::analogOutput1Change(uint8_t aChange) //Cambia las cuentas del PWM1 segun lo que se requiera en la interfaz
 {
-    pwmDuty1=aChange;
-    qDebug()<<"cuetnas del duty 1: "<< pwmDuty1;
+    unionTx.txBuffer.analogOutput1=aChange;
+    qDebug()<<"cuentas del duty 1: "<< unionTx.txBuffer.analogOutput1;
+    emit serialSend();
 }
 
 void comunicationThread::analogOutput2Change(uint8_t aChange)//Cambia las cuentas del PWM1 segun lo que se requiera en la interfaz
 {
-    pwmDuty2=aChange;
-    qDebug()<<"cuetnas del duty 2: "<< pwmDuty2;
+    unionTx.txBuffer.analogOutput2=aChange;
+    qDebug()<<"cuentas del duty 2: "<< unionTx.txBuffer.analogOutput2;
+    emit serialSend();
 }
 
