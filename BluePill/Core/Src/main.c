@@ -78,14 +78,18 @@ typedef union
   rxStruct_t rxUnionBuffer;
   char    rxBuffer_c[sizeof(rxStruct_t)];
 } unionRx_t; //Fin de union
-unionRx_t rxUnion;
+unionRx_t rxUnion; //variable del tipo unionRx_t
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void PWMCONTROL1();
+void PWMCONTROL2();
+void salidadigital();
+void entradadigital();
+void barridomux();
 /* USER CODE END PFP */
 
 
@@ -139,62 +143,6 @@ int main(void)
   	 int countingDown;
   	 while (1)
   	  {
-		if	(adcRead==100)
-			countingDown=1;
-		if (adcRead==0)
-			countingDown=0;
-
-		if(countingDown)
-			adcRead--;
-		else
-			adcRead++;
-
-
-		switch (adcInputCounter)
-		{
-			case 1: txBufferStruct.analogInput1 = adcRead; break;
-			case 2: txBufferStruct.analogInput2 = adcRead; break;
-			case 3: txBufferStruct.analogInput3 = adcRead; break;
-			case 4: txBufferStruct.analogInput4 = adcRead; break;
-			case 5: txBufferStruct.analogInput5 = adcRead; break;
-			case 6: txBufferStruct.analogInput6 = adcRead; break;
-			case 7: txBufferStruct.analogInput7 = adcRead; break;
-			case 8:
-			{
-				if (txBufferStruct.digitalInputs== 0b11111111)
-				{
-					digitalDown ==1;
-
-				}
-				else if (txBufferStruct.digitalInputs== 0b00000000)
-				{
-					digitalDown ==1;
-				}
-				if (digitalDown)
-				{
-					txBufferStruct.digitalInputs--;
-				}
-				else
-				{
-					txBufferStruct.digitalInputs++;
-				}
-
-				txBufferStruct.analogInput8 = adcRead;
-
-				readyToSend=1;
-				break;
-			}
-		}
-		adcInputCounter++;
-
-		if(readyToSend)
-		{
-			adcInputCounter=0;
-			readyToSend=0;
-			HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);			//Se programa Modul RS485 para Tx
-			HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
-			HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
-		}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -257,12 +205,74 @@ int c2=0;
 int counter=0;
 uint8_t digitalOutput;
 
+void PWMCONTROL1(){
+	//HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
+	htim3.Instance->CCR2=rxUnion.rxUnionBuffer.analogOutput1;
+	HAL_GPIO_WritePin(OPWM1_GPIO_Port, OPWM1_Pin, 1);
+}
+void PWMCONTROL2(){
+	//HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
+	htim3.Instance->CCR3=rxUnion.rxUnionBuffer.analogOutput2;
+	HAL_GPIO_WritePin(OPWM1_GPIO_Port, OPWM1_Pin, 1);
+}
+
+void salidadigital(){
+	for(int z=0;z<8;z++){
+		switch(z){
+
+		case 1 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b10000000)>>7 ==1){
+					   HAL_GPIO_TogglePin(O1_GPIO_Port,O1_Pin);}
+			         break;
+					}
+
+		case 2 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b01000000)>>6 ==1){
+			   	   	   HAL_GPIO_TogglePin(O2_GPIO_Port,O2_Pin);}
+					         break;
+							}
+		case 3 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00100000)>>5 ==1){
+			           HAL_GPIO_TogglePin(O3_GPIO_Port,O2_Pin);}
+					         break;
+							}
+		case 4 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00010000)>>4 ==1){
+			   	   	   HAL_GPIO_TogglePin(O4_GPIO_Port,O4_Pin);}
+					         break;
+							}
+		case 5 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00001000)>>3 ==1){
+			   	   	   HAL_GPIO_TogglePin(O5_GPIO_Port,O5_Pin);}
+					         break;
+							}
+		case 6 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000100)>>2 ==1){
+						HAL_GPIO_TogglePin(O6_GPIO_Port,O6_Pin);}
+					         break;
+							}
+		case 7 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000010)>>1 ==1){
+			   	   	   HAL_GPIO_TogglePin(O7_GPIO_Port,O7_Pin);}
+					         break;
+							}
+		case 8 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000001)>>0 ==1){
+			   	   	   HAL_GPIO_TogglePin(O8_GPIO_Port,O8_Pin);}
+					         break;
+							}
+
+		}
+	}
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	//funciones para poner en el callback. Hablar con dani
 	if (huart->Instance == USART1){
+	 //se completo la recepcion, ahora a procesar datos y sacar por salida
+
+
+		PWMCONTROL1(); //se llama a las funciones pwm mandando como parametro los valores recibidos de c1 y c2
+		PWMCONTROL2();
+		salidadigital();
+		//vuelvo a pedir datos
 		HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
+
 	}
+
 
 
 }
@@ -308,53 +318,4 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-/****************************************************************************/
-/***************CODIGOS VIEJOS POR SI HACE FALTA REFERENCIA******************/
-/****************************************************************************/
-
-/********** Codigo que estaba dentro del while para recibir el dial de Qt**********/
-/*
-	 	 HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);// Para rx
-
-	 	  if (HAL_UART_Receive(&huart1, &rs_buftx, 4, TIME_OUT)==HAL_OK)
-	 	  	  	  {
-	 		  	  	// HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-	 		  	  	 for (int i=0; i<4;i++)
-	 		  	  	 {
-	 		  	  		 aux.arreglo[i]=rs_buftx[i];
-	 		  	  	 }
-	 		  	  	 c1 = aux.x;
-	 		  	  HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);
-	 		  	  HAL_UART_Transmit(&huart1, &rs_buftx, 4, TIME_OUT);
-	 	  	 	  }
-					htim3.Instance->CCR1=c1;
-*/
-
-/********** Codigo de interrupcionens que estaba dentro de HAL_TIM_PeriodElapsedCallback().**********/
-/*******************De momento se evalua si sera necesario usar interrupciones***********************/
-
-//HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
-	//if (htim->Instance == TIM4)
-	/*{
-		HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET); //Se programa RS485 para recepcion
-
-			if (HAL_UART_Receive(&huart1, data, 1, 500)== HAL_OK)
-			{
-			 // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-				rxBuffer[counter]= data;
-				if(counter<3)
-				{
-					counter++;
-				}
-				else
-				{
-					counter=0;
-				}
-				//c1 = rxBuffer[0];
-				//c2 = rxBuffer[1];
-				//digitalOutput = rxBuffer [2];
-			}
-
-}			htim3.Instance->CCR1=c1;
-*/
 
