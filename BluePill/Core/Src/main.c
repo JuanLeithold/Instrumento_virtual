@@ -131,6 +131,8 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
   HAL_TIM_Base_Start_IT(&htim4);
   HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
@@ -144,7 +146,14 @@ int main(void)
   	 while (1)
   	  {
     /* USER CODE END WHILE */
-
+  		if(readyToSend)
+  				{
+  					adcInputCounter=0;
+  					readyToSend=0;
+  					HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);			//Se programa Modul RS485 para Tx
+  					HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
+  					HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
+  				}
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -217,45 +226,45 @@ void PWMCONTROL2(){
 }
 
 void salidadigital(){
-	for(int z=0;z<8;z++){
-		switch(z){
+	//for(int z=0;z<8;z++){
+		//switch(z){
 
-		case 1 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b10000000)>>7 ==1){
+		/*case 1 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b10000000)>>7 ==1){
 					   HAL_GPIO_TogglePin(O1_GPIO_Port,O1_Pin);}
-			         break;
-					}
+			         //break;
+					//}
 
-		case 2 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b01000000)>>6 ==1){
+		/*case 2 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b01000000)>>6 ==1){
 			   	   	   HAL_GPIO_TogglePin(O2_GPIO_Port,O2_Pin);}
-					         break;
-							}
-		case 3 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00100000)>>5 ==1){
+					  //       break;
+						//	}
+		/*case 3 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00100000)>>5 ==1){
 			           HAL_GPIO_TogglePin(O3_GPIO_Port,O2_Pin);}
-					         break;
-							}
-		case 4 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00010000)>>4 ==1){
+					      //   break;
+						//	}
+		/*case 4 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00010000)>>4 ==1){
 			   	   	   HAL_GPIO_TogglePin(O4_GPIO_Port,O4_Pin);}
-					         break;
-							}
-		case 5 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00001000)>>3 ==1){
+					  //       break;
+						//	}
+		/*case 5 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00001000)>>3 ==1){
 			   	   	   HAL_GPIO_TogglePin(O5_GPIO_Port,O5_Pin);}
-					         break;
-							}
-		case 6 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000100)>>2 ==1){
+					  //       break;
+						//	}
+		/*case 6 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000100)>>2 ==1){
 						HAL_GPIO_TogglePin(O6_GPIO_Port,O6_Pin);}
-					         break;
-							}
-		case 7 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000010)>>1 ==1){
+					      //   break;
+						//	}
+		/*case 7 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000010)>>1 ==1){
 			   	   	   HAL_GPIO_TogglePin(O7_GPIO_Port,O7_Pin);}
-					         break;
-							}
-		case 8 : {if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000001)>>0 ==1){
+					  //       break;
+						//	}
+		/*case 8 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000001)>>0 ==1){
 			   	   	   HAL_GPIO_TogglePin(O8_GPIO_Port,O8_Pin);}
-					         break;
-							}
+					  //       break;
+						//	}
 
-		}
-	}
+		//}
+	//}
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
