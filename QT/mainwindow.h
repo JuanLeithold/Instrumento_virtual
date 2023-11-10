@@ -26,8 +26,6 @@ public:
 
 public slots:
     void displayRxData(const unionRx_t &data);
-    void cambiarTexto(QString texto);
-
                                             /**********************************************************************/
     void PWM1dialChange(int data);          /*Slots que envian las cuentas del pwm al thread para la comunicacion */
     void PWM2dialChange(int data);          /**********************************************************************/
@@ -50,9 +48,14 @@ signals:
 
 
 
+private slots:
+
+    void on_startButton_clicked();
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
-    uint8_t prueba=0xf0;
+    bool working = false;
 
 };
 #endif // MAINWINDOW_H

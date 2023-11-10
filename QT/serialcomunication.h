@@ -12,7 +12,7 @@ public:
     void portInit(void);
 
     QSerialPort *serial;
-    QString portName="COM8";
+    QString portName="COM";
 
 signals:
 

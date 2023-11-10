@@ -8,11 +8,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)//Constructor
 {
     ui->setupUi(this);
-    _comunicationThread.start();
+
     /******************Signal Conections**********************/
     connect(ui->PWM1dial, SIGNAL(valueChanged(int)), this, SLOT(PWM1dialChange(int)));
     connect(ui->PWM2dial, SIGNAL(valueChanged(int)), this, SLOT(PWM2dialChange(int)));
-    connect(&_comunicationThread, SIGNAL(changeText(QString&)), this, SLOT(cambiarTexto(QString)));
     connect(this,  SIGNAL(digitalOutputChange(uint8_t)), &_comunicationThread, SLOT(digitalOutputChange(uint8_t)));
     connect(this,  SIGNAL(analogOutput1Change(uint8_t)), &_comunicationThread, SLOT(analogOutput1Change(uint8_t)));
     connect(this,  SIGNAL(analogOutput2Change(uint8_t)), &_comunicationThread, SLOT(analogOutput2Change(uint8_t)));
@@ -207,11 +206,7 @@ void MainWindow::displayRxData(const unionRx_t &data)
     actualizarLCD(enteroRecibido);
 }*/
 
-void MainWindow::cambiarTexto(QString texto)
-{
-    qDebug()<<"seteando Texto";
-    ui->AO1->setText(texto);
-}
+
 
 void MainWindow::on_d1Button_clicked()
 {
@@ -271,4 +266,27 @@ void MainWindow::on_d8Button_clicked()
     emit    digitalOutputChange(digitalOutput);
 }
 
+
+
+void MainWindow::on_startButton_clicked()
+{
+    if (!working)
+    {
+        _comunicationThread.start();
+        working = true;
+        qDebug()<<"Inicializando el instrumento Virutal";
+    }
+    else
+    {
+        qDebug()<<"Instrumento en funcionamiento";
+    }
+
+}
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    _comunicationThread.quit();
+    close();
+}
 

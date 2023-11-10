@@ -83,7 +83,6 @@ public slots:
 
 signals:
     void dataReceived(const unionRx_t &data);       //Señal que se emite cuando se obtienen todos los datos de la recepcion. La señal es detectada por MainWindows
-    void changeText (QString &texto);
     void serialSend(void);
 
 protected:

@@ -1,9 +1,15 @@
 #include "serialcomunication.h"
 #include <QDebug>
+#include <QSerialPortInfo>
 serialComunication::serialComunication(QObject *parent)
     : QObject{parent}
 {
     serial = new QSerialPort() ;
+    foreach(const QSerialPortInfo &serialInfo, QSerialPortInfo::availablePorts())
+    {
+        //qDebug()<<"Puerto Disponible: "<<serialInfo.portName();
+        portName = serialInfo.portName();
+    }
     portInit();
 }
 
@@ -15,6 +21,13 @@ void serialComunication::portInit()
     serial ->setParity      (QSerialPort::NoParity);
     serial ->setStopBits    (QSerialPort::OneStop);
     serial ->setFlowControl (QSerialPort::NoFlowControl);
-    serial ->open           (QIODevice::ReadWrite);
-    qDebug() << "Conectado al puerto serie" << serial->portName();
+    if (serial ->open           (QIODevice::ReadWrite))
+    {
+        qDebug() << "Conectado al puerto serie" << serial->portName();
+    }
+    else
+    {
+        qDebug()<<"Error en la conexion con la PC";
+    }
+
 }

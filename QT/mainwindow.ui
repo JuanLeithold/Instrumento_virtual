@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>797</width>
+    <width>1041</width>
     <height>431</height>
    </rect>
   </property>
@@ -297,7 +297,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -321,7 +321,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>580</x>
@@ -378,7 +378,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -548,13 +548,39 @@
      </item>
     </layout>
    </widget>
+   <widget class="QPushButton" name="startButton">
+    <property name="geometry">
+     <rect>
+      <x>820</x>
+      <y>40</y>
+      <width>141</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Start</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>820</x>
+      <y>170</y>
+      <width>141</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Exit</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>797</width>
+     <width>1041</width>
      <height>21</height>
     </rect>
    </property>
