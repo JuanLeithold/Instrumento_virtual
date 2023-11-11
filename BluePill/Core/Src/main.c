@@ -191,9 +191,9 @@ int main(void)
 		{
 			adcInputCounter=0;
 			readyToSend=0;
-			HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);			//Se programa Modul RS485 para Tx
+			//HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);			//Se programa Modul RS485 para Tx
 			HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
-			HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
+			//HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
 		}
     /* USER CODE END WHILE */
 
