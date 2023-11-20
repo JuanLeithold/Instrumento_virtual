@@ -1,0 +1,10 @@
+debug/analogoutput.o
+debug/main.o
+debug/mainwindow.o
+debug/serialcomunication.o
+debug/comunicationthread.o
+debug/qrc_imagenes.o
+debug/moc_analogoutput.o
+debug/moc_mainwindow.o
+debug/moc_serialcomunication.o
+debug/moc_comunicationthread.o
