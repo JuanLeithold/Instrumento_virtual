@@ -1,0 +1,10 @@
+release/analogoutput.o
+release/main.o
+release/mainwindow.o
+release/serialcomunication.o
+release/comunicationthread.o
+release/qrc_imagenes.o
+release/moc_analogoutput.o
+release/moc_mainwindow.o
+release/moc_serialcomunication.o
+release/moc_comunicationthread.o

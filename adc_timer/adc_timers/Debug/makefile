@@ -60,8 +60,8 @@ all: main-build
 main-build: adc_timers.elf secondary-outputs
 
 # Tool invocations
-adc_timers.elf adc_timers.map: $(OBJS) $(USER_OBJS) C:\Users\joniyromy\Documents\intrumetal\Instrumento_virtual\adc_timer\adc_timers\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "adc_timers.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\joniyromy\Documents\intrumetal\Instrumento_virtual\adc_timer\adc_timers\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="adc_timers.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+adc_timers.elf adc_timers.map: $(OBJS) $(USER_OBJS) C:\Users\joniyromy\Desktop\versionfinal\Instrumento_virtual\adc_timer\adc_timers\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "adc_timers.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\joniyromy\Desktop\versionfinal\Instrumento_virtual\adc_timer\adc_timers\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="adc_timers.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

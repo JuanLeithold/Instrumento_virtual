@@ -2794,7 +2794,11 @@
     (stroke (width 0) (type default))
     (uuid 34e52e55-2af9-4d62-95e5-9224e3318e41)
   )
+<<<<<<< HEAD
   (wire (pts (xy 170.18 94.9198) (xy 170.18 96.52))
+=======
+  (wire (pts (xy 167.9194 94.9198) (xy 167.9194 97.3074))
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
     (stroke (width 0) (type default))
     (uuid 353a39e7-2661-408c-be10-d57af039a7fd)
   )
@@ -3506,10 +3510,13 @@
     (stroke (width 0) (type default))
     (uuid 766e4985-1e49-49f0-a5eb-95b2d86400ab)
   )
+<<<<<<< HEAD
   (wire (pts (xy 170.18 94.9198) (xy 167.9194 94.9198))
     (stroke (width 0) (type default))
     (uuid 77b5ea70-8d1b-42ee-9199-70f05d80cbf9)
   )
+=======
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
   (wire (pts (xy 193.2686 111.5568) (xy 194.4116 111.5568))
     (stroke (width 0) (type default))
     (uuid 78542c1e-7b20-4201-850d-ff5c726f8047)
@@ -3722,7 +3729,11 @@
     (stroke (width 0) (type default))
     (uuid 8aae7835-de7d-4777-bb83-a96aca4fac97)
   )
+<<<<<<< HEAD
   (wire (pts (xy 158.0642 105.6132) (xy 170.18 105.6132))
+=======
+  (wire (pts (xy 158.0642 105.6132) (xy 167.9194 105.6132))
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
     (stroke (width 0) (type default))
     (uuid 8d7999db-e582-41be-b4e6-c302122750cf)
   )
@@ -3754,7 +3765,11 @@
     (stroke (width 0) (type default))
     (uuid 921c8972-04a7-4043-b0c1-3bd36bca106e)
   )
+<<<<<<< HEAD
   (wire (pts (xy 170.18 105.6132) (xy 170.18 104.14))
+=======
+  (wire (pts (xy 167.9194 105.6132) (xy 167.9194 104.9274))
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
     (stroke (width 0) (type default))
     (uuid 92c4f23e-7182-4ccc-b31d-3d1f069007ac)
   )
@@ -6439,6 +6454,7 @@
     )
   )
 
+<<<<<<< HEAD
   (symbol (lib_id "Device:C_Polarized_US") (at 170.18 100.33 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 29922c9f-a39d-49ac-afbf-96d90ad0e6dc)
@@ -6452,6 +6468,21 @@
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 170.18 100.33 0)
+=======
+  (symbol (lib_id "Device:C_Polarized_US") (at 167.9194 101.1174 0) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid 29922c9f-a39d-49ac-afbf-96d90ad0e6dc)
+    (property "Reference" "C10" (at 161.544 101.2444 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Value" "10uF" (at 161.0614 103.251 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm" (at 167.9194 101.1174 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "~" (at 167.9194 101.1174 0)
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 604655fe-6f1b-48c8-ac4e-cc4971aae0d7))

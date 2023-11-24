@@ -87,6 +87,11 @@ void Error_Handler(void);
 #define EN_GPIO_Port GPIOB
 #define BUZZER_Pin GPIO_PIN_15
 #define BUZZER_GPIO_Port GPIOB
+<<<<<<< HEAD
+=======
+#define RS_MODE_Pin GPIO_PIN_8
+#define RS_MODE_GPIO_Port GPIOA
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
 #define TX_Pin GPIO_PIN_9
 #define TX_GPIO_Port GPIOA
 #define RX_Pin GPIO_PIN_10

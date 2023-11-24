@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
+  **************************
   * @file           : main.c
   * @brief          : Main program body
-  ******************************************************************************
+  **************************
   * @attention
   *
   * Copyright (c) 2023 STMicroelectronics.
@@ -13,7 +13,7 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
-  ******************************************************************************
+  **************************
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -33,6 +33,31 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+<<<<<<< HEAD
+=======
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE BEGIN PV */
+uint8_t digitalInputAux=0;
+uint16_t adcRead=0;
+int adcInputCounter =0;		//Contador para ir seleccionando diferentes lecturas del adc y modificar el mux
+int readyToSend=0;
+int digitalDown=0;
+int canal=0;
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
 
 /* USER CODE END PTD */
 
@@ -109,12 +134,67 @@ void PWMCONTROL1();
 void PWMCONTROL2();
 void salidadigital();
 void entradadigital();
+<<<<<<< HEAD
 void MUX_SelectChannel(int);
+=======
+void barridomux();
+void MUX_SelectChannel(int );
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+<<<<<<< HEAD
 
+=======
+void MUX_SelectChannel(canal){
+
+	switch (canal){
+	case 0:
+		        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+			 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+			 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH0
+				 break;
+	case 1:
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH1
+				 break;
+	case 2:
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH2
+				 break;
+	case 3:
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH3
+				 break;
+	case 4:
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH4
+				 break;
+	case 5:
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH5
+				 break;
+	case 6:
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH6
+				 break;
+	case 7:
+		 HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+					 	HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH7
+				 break;
+
+	}
+}
+
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
 /* USER CODE END 0 */
 
 /**
@@ -125,9 +205,12 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+<<<<<<< HEAD
 
 			//Contador para ir seleccionando diferentes lecturas del adc y modificar el mux
 	int readyToSend=0;
+=======
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
 
 	txBufferStruct.header = 0x1c;			//Cabecera para que QT dicierna que datos son correctos
 	txBufferStruct.digitalInputs = 0x00;	//valor de i inicio para prueba
@@ -153,6 +236,10 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_TIM4_Init();
+<<<<<<< HEAD
+=======
+  MX_TIM2_Init();
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
   MX_TIM3_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
@@ -168,6 +255,7 @@ int main(void)
 
   	HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));	//para recepcion de la blue pil. Esta en proceso.
 
+<<<<<<< HEAD
  // 	 int countingDown;
 
   	 while (1)
@@ -185,15 +273,30 @@ int main(void)
 			adcRead++;
 */
 		switch (adcInputCounter)
+=======
+  	 int countingDown;
+
+  	 while (1)
+  	  {
+  		//entradadigital();
+
+  				/*MUX_SelectChannel(adcInputCounter);
+  				 HAL_ADC_Start(&hadc1);
+  				 HAL_ADC_PollForConversion(&hadc1,100);
+  				 adcRead= HAL_ADC_GetValue(&hadc1);
+  				 HAL_ADC_Stop(&hadc1);*/
+
+		/*switch (adcInputCounter)
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
 		{
-			case 1: txBufferStruct.analogInput1 = adcRead; break;
-			case 2: txBufferStruct.analogInput2 = adcRead; break;
-			case 3: txBufferStruct.analogInput3 = adcRead; break;
-			case 4: txBufferStruct.analogInput4 = adcRead; break;
-			case 5: txBufferStruct.analogInput5 = adcRead; break;
-			case 6: txBufferStruct.analogInput6 = adcRead; break;
-			case 7: txBufferStruct.analogInput7 = adcRead; break;
-			case 8:
+			case 0: txBufferStruct.analogInput1 = adcRead; break;
+			case 1: txBufferStruct.analogInput2 = adcRead; break;
+			case 2: txBufferStruct.analogInput3 = adcRead; break;
+			case 3: txBufferStruct.analogInput4 = adcRead; break;
+			case 4: txBufferStruct.analogInput5 = adcRead; break;
+			case 5: txBufferStruct.analogInput6 = adcRead; break;
+			case 6: txBufferStruct.analogInput7 = adcRead; break;
+			case 7:
 			{
 
 				txBufferStruct.analogInput8 = adcRead;
@@ -201,17 +304,22 @@ int main(void)
 				readyToSend=1;
 				break;
 			}
-		}
-		adcInputCounter++;
+		}*/
+		//adcInputCounter++;
 
-		if(readyToSend)
+		/*if(readyToSend)
 		{
+			txBufferStruct.digitalInputs = digitalInputAux;
 			adcInputCounter=0;
 			readyToSend=0;
 
 			HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
 			HAL_Delay(50);
+<<<<<<< HEAD
 		}
+=======
+		}*/
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -285,6 +393,7 @@ void PWMCONTROL2(){
 
 void salidadigital(){
 
+<<<<<<< HEAD
   if((rxUnion.rxUnionBuffer.digitalOutputs & 0b10000000)>>7 ==1){
         HAL_GPIO_TogglePin(O1_GPIO_Port,O1_Pin);}
 
@@ -424,8 +533,71 @@ void MUX_SelectChannel(canal){
         break;
 
   }
-}
+=======
+		if((rxUnion.rxUnionBuffer.digitalOutputs & 0b10000000)>>7 ==1){
+					   HAL_GPIO_TogglePin(O1_GPIO_Port,O1_Pin);}
 
+
+		if((rxUnion.rxUnionBuffer.digitalOutputs & 0b01000000)>>6 ==1){
+			   	   	   HAL_GPIO_TogglePin(O2_GPIO_Port,O2_Pin);}
+
+		if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00100000)>>5 ==1){
+			           HAL_GPIO_TogglePin(O3_GPIO_Port,O3_Pin);}
+
+		if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00010000)>>4 ==1){
+			   	   	   HAL_GPIO_TogglePin(O4_GPIO_Port,O4_Pin);}
+
+		if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00001000)>>3 ==1){
+			   	   	   HAL_GPIO_TogglePin(O5_GPIO_Port,O5_Pin);}
+
+	if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000100)>>2 ==1){
+						HAL_GPIO_TogglePin(O6_GPIO_Port,O6_Pin);}
+
+		if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000010)>>1 ==1){
+			   	   	   HAL_GPIO_TogglePin(O7_GPIO_Port,O7_Pin);}
+
+		if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000001)>>0 ==1){
+			   	   	   HAL_GPIO_TogglePin(O8_GPIO_Port,O8_Pin);}
+
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
+}
+//
+void entradadigital(){
+
+	if (HAL_GPIO_ReadPin(GPIOB, ID1_Pin ))
+	{
+		txBufferStruct.digitalInputs^= 0b00000001;
+	}
+	if (HAL_GPIO_ReadPin(GPIOB, ID2_Pin ))
+	{
+		txBufferStruct.digitalInputs^= 0b00000010;
+	}
+	if (HAL_GPIO_ReadPin(GPIOB, ID3_Pin ))
+	{
+		txBufferStruct.digitalInputs^= 0b00000100;
+	}
+	if (HAL_GPIO_ReadPin(GPIOB, ID4_Pin ))
+	{
+		txBufferStruct.digitalInputs^= 0b00001000;
+	}
+	if (HAL_GPIO_ReadPin(GPIOB, ID5_Pin ))
+	{
+		txBufferStruct.digitalInputs^= 0b00010000;
+	}
+	if (HAL_GPIO_ReadPin(GPIOB, ID6_Pin ))
+	{
+		txBufferStruct.digitalInputs^= 0b00100000;
+	}
+	if (HAL_GPIO_ReadPin(GPIOB, ID7_Pin ))
+	{
+		txBufferStruct.digitalInputs^= 0b01000000;
+	}
+	if (HAL_GPIO_ReadPin(GPIOB, ID8_Pin ))
+	{
+		txBufferStruct.digitalInputs^= 0b10000000;
+	}
+
+}
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if (huart->Instance == USART1){
@@ -441,6 +613,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+<<<<<<< HEAD
 	if (htim->Instance == TIM4)
 	  {
 			//MUX_SelectChannel();
@@ -449,8 +622,52 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	        adcRead= HAL_ADC_GetValue(&hadc1);
 	        HAL_ADC_Stop(&hadc1);
 	  }
-}
+=======
+	if (htim->Instance == TIM4) {
+		entradadigital();
+			// HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+			 for(adcInputCounter=0;adcInputCounter<8;adcInputCounter++)
+			 {
+				 MUX_SelectChannel(adcInputCounter);
+				 HAL_ADC_Start(&hadc1);
+				 HAL_ADC_PollForConversion(&hadc1,HAL_MAX_DELAY);
+				 adcRead= HAL_ADC_GetValue(&hadc1);
+				 HAL_ADC_Stop(&hadc1);
 
+				 switch (adcInputCounter)
+					{
+						case 0: txBufferStruct.analogInput1 = adcRead; break;
+						case 1: txBufferStruct.analogInput2 = adcRead; break;
+						case 2: txBufferStruct.analogInput3 = adcRead; break;
+						case 3: txBufferStruct.analogInput4 = adcRead; break;
+						case 4: txBufferStruct.analogInput5 = adcRead; break;
+						case 5: txBufferStruct.analogInput6 = adcRead; break;
+						case 6: txBufferStruct.analogInput7 = adcRead; break;
+						case 7:
+						{
+
+							txBufferStruct.analogInput8 = adcRead;
+
+							readyToSend=1;
+							break;
+						}
+
+
+					}
+			 	 }
+
+				if(readyToSend)
+					{
+
+						adcInputCounter=0;
+						readyToSend=0;
+
+						HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
+						//HAL_Delay(50);
+					}
+				}
+>>>>>>> c499ee18f90316c201fdafdd6c6c334d44865699
+}
 
 /* USER CODE END 4 */
 

@@ -46,7 +46,7 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
-uint32_t adc_val[8];
+uint16_t adc_val[8];
 uint32_t adc_val1;
 int position=0;
 int ready = 0;
