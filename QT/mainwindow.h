@@ -20,6 +20,8 @@ public:
     MainWindow(QWidget *parent = nullptr);  //Constructor
     ~MainWindow();                          //Destructor
     void digitalInputChange(uint8_t digitalInputs);
+    float dutyToFloat_zero_to_ten_input(int duty);
+    float dutyToFloat_minus_five_to_five_input(int duty);
 
     analogOutput       _analogOutputData;   //Instancia de la clase con los datos del duty para los PWM
     comunicationThread _comunicationThread; //Instancia de la clase para el manejo del puerto serie
@@ -45,8 +47,6 @@ signals:
     void digitalOutputChange  (uint8_t dChange);
     void analogOutput1Change  (uint8_t aChange);
     void analogOutput2Change  (uint8_t aChange);
-
-
 
 private slots:
 

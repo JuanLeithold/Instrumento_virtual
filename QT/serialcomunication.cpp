@@ -7,7 +7,6 @@ serialComunication::serialComunication(QObject *parent)
     serial = new QSerialPort() ;
     foreach(const QSerialPortInfo &serialInfo, QSerialPortInfo::availablePorts())
     {
-        //qDebug()<<"Puerto Disponible: "<<serialInfo.portName();
         portName = serialInfo.portName();
     }
     portInit();

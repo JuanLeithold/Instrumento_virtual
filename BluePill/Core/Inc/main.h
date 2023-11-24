@@ -57,8 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define LED_Pin GPIO_PIN_13
-#define LED_GPIO_Port GPIOC
 #define O1_Pin GPIO_PIN_14
 #define O1_GPIO_Port GPIOC
 #define O2_Pin GPIO_PIN_15
@@ -79,18 +77,16 @@ void Error_Handler(void);
 #define OPWM1_GPIO_Port GPIOA
 #define OPWM2_Pin GPIO_PIN_0
 #define OPWM2_GPIO_Port GPIOB
-#define BUZZER_Pin GPIO_PIN_1
-#define BUZZER_GPIO_Port GPIOB
+#define MUXA_Pin GPIO_PIN_1
+#define MUXA_GPIO_Port GPIOB
+#define MUXB_Pin GPIO_PIN_10
+#define MUXB_GPIO_Port GPIOB
+#define MUXC_Pin GPIO_PIN_11
+#define MUXC_GPIO_Port GPIOB
 #define EN_Pin GPIO_PIN_12
 #define EN_GPIO_Port GPIOB
-#define MUXC_Pin GPIO_PIN_13
-#define MUXC_GPIO_Port GPIOB
-#define MUXB_Pin GPIO_PIN_14
-#define MUXB_GPIO_Port GPIOB
-#define MUXA_Pin GPIO_PIN_15
-#define MUXA_GPIO_Port GPIOB
-#define RS_MODE_Pin GPIO_PIN_8
-#define RS_MODE_GPIO_Port GPIOA
+#define BUZZER_Pin GPIO_PIN_15
+#define BUZZER_GPIO_Port GPIOB
 #define TX_Pin GPIO_PIN_9
 #define TX_GPIO_Port GPIOA
 #define RX_Pin GPIO_PIN_10

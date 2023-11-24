@@ -31,8 +31,28 @@
 #include <time.h>
 /* USER CODE END Includes */
 
-/* USER CODE BEGIN PV */
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
 
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE BEGIN PV */
+uint8_t digitalInputAux=0;
+int aux1, aux2;
+int adcInputCounter =1;
+uint16_t adcRead;
 /*Estructura para almacenar los datos a transmitir con su respectiva variable declarada*/
 typedef struct {
   // Byte de caebcera.
@@ -89,18 +109,25 @@ void PWMCONTROL1();
 void PWMCONTROL2();
 void salidadigital();
 void entradadigital();
-void barridomux();
+void MUX_SelectChannel(int);
 /* USER CODE END PFP */
 
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-	static uint16_t adcRead;
-	int adcInputCounter =1;		//Contador para ir seleccionando diferentes lecturas del adc y modificar el mux
+
+			//Contador para ir seleccionando diferentes lecturas del adc y modificar el mux
 	int readyToSend=0;
-	int digitalDown=0;
 
 	txBufferStruct.header = 0x1c;			//Cabecera para que QT dicierna que datos son correctos
 	txBufferStruct.digitalInputs = 0x00;	//valor de i inicio para prueba
@@ -125,10 +152,9 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
-  MX_TIM3_Init();
   MX_TIM4_Init();
+  MX_TIM3_Init();
   MX_ADC1_Init();
-
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
@@ -139,13 +165,15 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  	HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);				//Para utilizar modulo rs485 en rx
+
   	HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));	//para recepcion de la blue pil. Esta en proceso.
 
-  	 int countingDown;
+ // 	 int countingDown;
+
   	 while (1)
   	  {
-<<<<<<< HEAD
+  		entradadigital();
+/*
 		if	(adcRead==100)
 			countingDown=1;
 		if (adcRead==0)
@@ -155,8 +183,7 @@ int main(void)
 			adcRead--;
 		else
 			adcRead++;
-
-
+*/
 		switch (adcInputCounter)
 		{
 			case 1: txBufferStruct.analogInput1 = adcRead; break;
@@ -168,23 +195,6 @@ int main(void)
 			case 7: txBufferStruct.analogInput7 = adcRead; break;
 			case 8:
 			{
-				if (txBufferStruct.digitalInputs== 0b11111111)
-				{
-					digitalDown ==1;
-
-				}
-				else if (txBufferStruct.digitalInputs== 0b00000000)
-				{
-					digitalDown ==1;
-				}
-				if (digitalDown)
-				{
-					txBufferStruct.digitalInputs--;
-				}
-				else
-				{
-					txBufferStruct.digitalInputs++;
-				}
 
 				txBufferStruct.analogInput8 = adcRead;
 
@@ -198,21 +208,12 @@ int main(void)
 		{
 			adcInputCounter=0;
 			readyToSend=0;
-			//HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);			//Se programa Modul RS485 para Tx
+
 			HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
-			//HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
+			HAL_Delay(50);
 		}
-=======
->>>>>>> 0c459ebb008ef5e87410555e15743d164119a668
     /* USER CODE END WHILE */
-  		if(readyToSend)
-  				{
-  					adcInputCounter=0;
-  					readyToSend=0;
-  					HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_SET);			//Se programa Modul RS485 para Tx
-  					HAL_UART_Transmit(&huart1, (uint8_t*)&txBufferStruct, sizeof(txBufferStruct), TIME_OUT);
-  					HAL_GPIO_WritePin(GPIOA, RS_MODE_Pin, GPIO_PIN_RESET);
-  				}
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -222,7 +223,6 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
-
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -266,89 +266,189 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-uint8_t rxBuffer[3];
-uint8_t data;
-int c1=0;
-int c2=0;
 int counter=0;
 uint8_t digitalOutput;
 
+
 void PWMCONTROL1(){
-	//HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
-	htim3.Instance->CCR2=rxUnion.rxUnionBuffer.analogOutput1;
-	HAL_GPIO_WritePin(OPWM1_GPIO_Port, OPWM1_Pin, 1);
+  //HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
+  aux1=rxUnion.rxUnionBuffer.analogOutput1*10;
+  htim3.Instance->CCR2=aux1;
+  HAL_GPIO_WritePin(OPWM1_GPIO_Port, OPWM1_Pin, 1);
 }
 void PWMCONTROL2(){
-	//HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
-	htim3.Instance->CCR3=rxUnion.rxUnionBuffer.analogOutput2;
-	HAL_GPIO_WritePin(OPWM1_GPIO_Port, OPWM1_Pin, 1);
+  //HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
+  aux2=rxUnion.rxUnionBuffer.analogOutput2*10;
+  htim3.Instance->CCR3=aux2;
+  HAL_GPIO_WritePin(OPWM1_GPIO_Port, OPWM1_Pin, 1);
 }
 
 void salidadigital(){
-	//for(int z=0;z<8;z++){
-		//switch(z){
 
-		/*case 1 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b10000000)>>7 ==1){
-					   HAL_GPIO_TogglePin(O1_GPIO_Port,O1_Pin);}
-			         //break;
-					//}
+  if((rxUnion.rxUnionBuffer.digitalOutputs & 0b10000000)>>7 ==1){
+        HAL_GPIO_TogglePin(O1_GPIO_Port,O1_Pin);}
 
-		/*case 2 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b01000000)>>6 ==1){
-			   	   	   HAL_GPIO_TogglePin(O2_GPIO_Port,O2_Pin);}
-					  //       break;
-						//	}
-		/*case 3 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00100000)>>5 ==1){
-			           HAL_GPIO_TogglePin(O3_GPIO_Port,O2_Pin);}
-					      //   break;
-						//	}
-		/*case 4 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00010000)>>4 ==1){
-			   	   	   HAL_GPIO_TogglePin(O4_GPIO_Port,O4_Pin);}
-					  //       break;
-						//	}
-		/*case 5 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00001000)>>3 ==1){
-			   	   	   HAL_GPIO_TogglePin(O5_GPIO_Port,O5_Pin);}
-					  //       break;
-						//	}
-		/*case 6 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000100)>>2 ==1){
-						HAL_GPIO_TogglePin(O6_GPIO_Port,O6_Pin);}
-					      //   break;
-						//	}
-		/*case 7 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000010)>>1 ==1){
-			   	   	   HAL_GPIO_TogglePin(O7_GPIO_Port,O7_Pin);}
-					  //       break;
-						//	}
-		/*case 8 : {*/if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000001)>>0 ==1){
-			   	   	   HAL_GPIO_TogglePin(O8_GPIO_Port,O8_Pin);}
-					  //       break;
-						//	}
 
-		//}
-	//}
+  if((rxUnion.rxUnionBuffer.digitalOutputs & 0b01000000)>>6 ==1){
+        HAL_GPIO_TogglePin(O2_GPIO_Port,O2_Pin);}
+
+  if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00100000)>>5 ==1){
+        HAL_GPIO_TogglePin(O3_GPIO_Port,O3_Pin);}
+
+  if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00010000)>>4 ==1){
+        HAL_GPIO_TogglePin(O4_GPIO_Port,O4_Pin);}
+
+  if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00001000)>>3 ==1){
+        HAL_GPIO_TogglePin(O5_GPIO_Port,O5_Pin);}
+
+  if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000100)>>2 ==1){
+        HAL_GPIO_TogglePin(O6_GPIO_Port,O6_Pin);}
+
+  if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000010)>>1 ==1){
+        HAL_GPIO_TogglePin(O7_GPIO_Port,O7_Pin);}
+
+  if((rxUnion.rxUnionBuffer.digitalOutputs & 0b00000001)>>0 ==1){
+        HAL_GPIO_TogglePin(O8_GPIO_Port,O8_Pin);}
+
+}
+void entradadigital(){
+
+  if (HAL_GPIO_ReadPin(GPIOB, ID1_Pin ))
+  {
+        txBufferStruct.digitalInputs |= 0b00000001;
+  }
+  else
+  {
+        txBufferStruct.digitalInputs &= 0b11111110;
+  }
+  if (HAL_GPIO_ReadPin(GPIOB, ID2_Pin ))
+  {
+        txBufferStruct.digitalInputs|= 0b00000010;
+  }
+  else
+  {
+        txBufferStruct.digitalInputs &= 0b11111101;
+  }
+  if (HAL_GPIO_ReadPin(GPIOB, ID3_Pin ))
+  {
+        txBufferStruct.digitalInputs|= 0b00000100;
+  }
+  else
+  {
+        txBufferStruct.digitalInputs &= 0b11111011;
+  }
+  if (HAL_GPIO_ReadPin(GPIOB, ID4_Pin ))
+  {
+        txBufferStruct.digitalInputs|= 0b00001000;
+  }
+  else
+  {
+        txBufferStruct.digitalInputs &= 0b11110111;
+  }
+  if (HAL_GPIO_ReadPin(GPIOB, ID5_Pin ))
+  {
+        txBufferStruct.digitalInputs|= 0b00010000;
+  }
+  else
+  {
+        txBufferStruct.digitalInputs &= 0b11101111;
+  }
+  if (HAL_GPIO_ReadPin(GPIOB, ID6_Pin ))
+  {
+        txBufferStruct.digitalInputs|= 0b00100000;
+  }
+  else
+  {
+        txBufferStruct.digitalInputs &= 0b11011111;
+  }
+  if (HAL_GPIO_ReadPin(GPIOB, ID7_Pin ))
+  {
+        txBufferStruct.digitalInputs|= 0b10000000;
+  }
+  else
+  {
+        txBufferStruct.digitalInputs &= 0b01111111;
+  }
+  if (HAL_GPIO_ReadPin(GPIOA, ID8_Pin ))
+  {
+        txBufferStruct.digitalInputs|= 0b01000000;
+  }
+  else
+  {
+        txBufferStruct.digitalInputs &= 0b10111111;
+  }
+
+}
+void MUX_SelectChannel(canal){
+
+  switch (canal){
+  case 0:
+        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH0
+        break;
+  case 1:
+        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH1
+        break;
+  case 2:
+        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH2
+        break;
+  case 3:
+        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_RESET);//CH3
+        break;
+  case 4:
+        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH4
+        break;
+  case 5:
+        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH5
+        break;
+  case 6:
+        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH6
+        break;
+  case 7:
+        HAL_GPIO_WritePin(MUXA_GPIO_Port, MUXA_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(MUXB_GPIO_Port, MUXB_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(MUXC_GPIO_Port, MUXC_Pin, GPIO_PIN_SET);//CH7
+        break;
+
+  }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	//funciones para poner en el callback. Hablar con dani
 	if (huart->Instance == USART1){
-	 //se completo la recepcion, ahora a procesar datos y sacar por salida
 
-
-		PWMCONTROL1(); //se llama a las funciones pwm mandando como parametro los valores recibidos de c1 y c2
+		PWMCONTROL1();
 		PWMCONTROL2();
 		salidadigital();
-		//vuelvo a pedir datos
+
 		HAL_UART_Receive_IT(&huart1, (uint8_t*)&rxUnion,sizeof(rxUnion));
-
 	}
-
-
-
 }
 
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-
+	if (htim->Instance == TIM4)
+	  {
+			//MUX_SelectChannel();
+			HAL_ADC_Start(&hadc1);
+	        HAL_ADC_PollForConversion(&hadc1,HAL_MAX_DELAY);
+	        adcRead= HAL_ADC_GetValue(&hadc1);
+	        HAL_ADC_Stop(&hadc1);
+	  }
 }
 
 
@@ -385,5 +485,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-

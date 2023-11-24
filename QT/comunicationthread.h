@@ -64,17 +64,15 @@ public:
     unionTx_t  unionTx;
     QByteArray headerArray;                         // Variable auxiliar para la comparacion del header recibido por serial.
 
-    uint8_t pwmDuty1=50;                             /*******************************************************/
-    uint8_t pwmDuty2=50;                             /**Variables que almacenaranlos datos a enviar a la BP**/
-    uint8_t digitalOutputs;              /*******************************************************/
-
+    void printDataInHex();
 private:
+
     QByteArray data;                                // Para recibir de a un byte por puerto serie.
     QByteArray dataBuffer;                          // Para acumular los datos recibidos.
     unsigned int bytesReceived;                     //Para llevar un conteo de los bytes recibidos.
 
 public slots:
-   // serialRead();
+
     bool serialTx(void);                            //Manejo de archivos para Tx a BluePill
 
     void digitalOutputChange  (uint8_t dChange);    //Slots que se ejecutan ante una señal emitida por la interfaz gráfica (botones, dial, etc)

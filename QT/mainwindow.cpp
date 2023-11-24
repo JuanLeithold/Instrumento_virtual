@@ -49,7 +49,6 @@ MainWindow::~MainWindow() //Destructor
 
 void MainWindow::PWM1dialChange(int indice)
 {
-
     QString tension;
     int duty;
 
@@ -169,43 +168,89 @@ void MainWindow::digitalInputChange(uint8_t digitalInputs)
 
 }
 
+float MainWindow::dutyToFloat_zero_to_ten_input(int duty)
+{
+   /********************Por lookup table*******************************/
+   /* float analog_0_10[20]={1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    for (int i=1; i<=100; i++)
+    {
+        if  (duty   <= i * (4096/100))
+        {
+            return analog_0_10[i-1];
+        }
+    }*/
+  /*******************************************************************/
+
+  /********************Por cuentas*******************************/
+    float count_value = 3.3 / 4096;
+    float opamp_division = 5/3.3;
+    float calc =duty * count_value * opamp_division * 2;
+        float analog_output= ((int)(calc * 100 + 0.5)) / 100.0;
+    return analog_output;
+}
+
+
+
+float MainWindow::dutyToFloat_minus_five_to_five_input(int duty)
+{
+    /********************Por lookup table*******************************/
+   /* float analog_minus_five_to_five[100]={1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    for (int i=1; i<=100; i++)
+    {
+        if  (duty   <= i * (4096/100))
+        {
+            return analog_minus_five_to_five[i-1];
+        }
+    }*/
+    /*******************************************************************/
+
+    /********************Por cuentas*******************************/
+    float count_value = 3.3 / 4096;
+    float opamp_division = 5/3.3;
+    float calc =((duty * count_value * opamp_division) - 2.5 ) * 2;
+    float analog_output= ((int)(calc * 100 + 0.5)) / 100.0;
+    return analog_output;
+
+}
+
 void MainWindow::displayRxData(const unionRx_t &data)
 {
     uint8_t digitalInputs = data.rxBuffer.digitalInputs;
     QString text = QString::number(digitalInputs, 2);
     //qDebug()<< "digitalInputs: "<< text;
 
-    ui->AN1->display(data.rxBuffer.analogInput1);
-    ui->AN2->display(data.rxBuffer.analogInput2);
-    ui->AN3->display(data.rxBuffer.analogInput3);
-    ui->AN4->display(data.rxBuffer.analogInput4);
-    ui->AN5->display(data.rxBuffer.analogInput5);
-    ui->AN6->display(data.rxBuffer.analogInput6);
-    ui->AN7->display(data.rxBuffer.analogInput7);
-    ui->AN8->display(data.rxBuffer.analogInput8);
+    ui->AN1->display(dutyToFloat_zero_to_ten_input(data.rxBuffer.analogInput1));
+
+    ui->AN2->display(dutyToFloat_zero_to_ten_input(data.rxBuffer.analogInput2));
+    ui->AN3->display(dutyToFloat_zero_to_ten_input(data.rxBuffer.analogInput3));
+    ui->AN4->display(dutyToFloat_zero_to_ten_input(data.rxBuffer.analogInput4));
+    ui->AN5->display(dutyToFloat_zero_to_ten_input(data.rxBuffer.analogInput5));
+    ui->AN6->display(dutyToFloat_zero_to_ten_input(data.rxBuffer.analogInput6));
+    ui->AN7->display(dutyToFloat_zero_to_ten_input(data.rxBuffer.analogInput7));
+    ui->AN8->display(dutyToFloat_minus_five_to_five_input(data.rxBuffer.analogInput8));
 
     digitalInputChange(digitalInputs);
 
 
 }
-
-/*void MainWindow::serialRead()                           //Lee las cuentas que llegan de la BP
-{
-    char buffer[sizeof(int)];
-    int enteroRecibido;
-    if (serialCom.serial->read(buffer, sizeof(buffer)) == sizeof(buffer))
-    {
-        memcpy(&enteroRecibido, &buffer, sizeof(int));
-
-    }
-    else
-    {
-        qDebug()<<"no se recibio nada";
-    }
-
-    actualizarLCD(enteroRecibido);
-}*/
-
 
 
 void MainWindow::on_d1Button_clicked()
@@ -213,11 +258,7 @@ void MainWindow::on_d1Button_clicked()
     uint8_t digitalOutput=0b00000001;
 
     emit    digitalOutputChange(digitalOutput);
-
-    ui->LED1->setPixmap(QPixmap("C:/Users/Juan Leithold/Instrumento_virtual/QT/ledVerde"));
-    ui->LED1->setFixedSize(60,60);
 }
-
 void MainWindow::on_d2Button_clicked()
 {
     uint8_t digitalOutput=0b00000010;
@@ -230,43 +271,36 @@ void MainWindow::on_d3Button_clicked()
 
     emit    digitalOutputChange(digitalOutput);
 }
-
 void MainWindow::on_d4Button_clicked()
 {
     uint8_t digitalOutput=0b00001000;
 
     emit    digitalOutputChange(digitalOutput);
 }
-
 void MainWindow::on_d5Button_clicked()
 {
     uint8_t digitalOutput=0b00010000;
 
     emit    digitalOutputChange(digitalOutput);
 }
-
 void MainWindow::on_d6Button_clicked()
 {
     uint8_t digitalOutput=0b00100000;
 
     emit    digitalOutputChange(digitalOutput);
 }
-
 void MainWindow::on_d7Button_clicked()
 {
     uint8_t digitalOutput=0b01000000;
 
     emit    digitalOutputChange(digitalOutput);
 }
-
 void MainWindow::on_d8Button_clicked()
 {
     uint8_t digitalOutput=0b10000000;
 
     emit    digitalOutputChange(digitalOutput);
 }
-
-
 
 void MainWindow::on_startButton_clicked()
 {

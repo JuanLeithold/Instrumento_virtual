@@ -7,7 +7,6 @@ struct analogOutputStruct
 {
     QString value;
     int dutyAccounts;
-
 };
 
 class analogOutput : public QObject
